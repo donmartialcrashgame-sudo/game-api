@@ -1,15 +1,184 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gaming API — Live Crash</title><style>:root{--bg:#050811;--panel:#0b1220;--line:#ffffff12;--text:#f8fafc;--muted:#91a0b5;--blue:#4f8cff;--green:#20c997}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% 0,#4f8cff19,transparent 35%),var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif}.nav{height:68px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:#070c16e8;backdrop-filter:blur(14px)}.brand{font-weight:900}.login{padding:10px 15px;border:1px solid #ffffff18;border-radius:9px;color:#fff;text-decoration:none;background:#ffffff08}.wrap{max-width:1050px;margin:auto;padding:30px 20px}.intro{text-align:center;margin:8px auto 28px;max-width:680px}.intro h1{font-size:clamp(30px,6vw,52px);margin:0 0 10px}.intro p{color:var(--muted);line-height:1.7;margin:0}.live{display:flex;align-items:center;justify-content:center;gap:8px;color:#9debd3;font-size:11px;text-transform:uppercase;letter-spacing:1.2px}.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 14px #20c997}.board{padding:22px;border:1px solid var(--line);border-radius:22px;background:#0b1220;box-shadow:0 30px 90px #0008}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}.state{padding:7px 10px;border-radius:999px;background:#ffffff08;color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.8px}.multiplier{min-height:210px;display:grid;place-items:center;border:1px solid #ffffff10;border-radius:18px;background:radial-gradient(circle,#4f8cff13,transparent 62%),#070c16}.multiplier strong{font-size:clamp(55px,13vw,110px);letter-spacing:-4px}.multiplier small{display:block;text-align:center;color:var(--muted);font-size:12px;letter-spacing:1px;margin-top:-10px}.history{margin-top:20px}.history h2{font-size:14px;margin:0 0 12px}.rounds{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.round{padding:13px;border:1px solid var(--line);border-radius:12px;background:#ffffff05}.round .id{color:var(--muted);font-size:10px}.round .status{font-size:11px;font-weight:800;margin-top:7px}.round .value{font-size:20px;font-weight:900;margin-top:4px}.empty{color:var(--muted);font-size:12px;padding:18px;text-align:center;border:1px dashed var(--line);border-radius:12px}.note{margin-top:18px;color:#66748a;font-size:11px;text-align:center;line-height:1.6}@media(max-width:760px){.rounds{grid-template-columns:repeat(2,1fr)}}@media(max-width:430px){.nav{padding:0 14px}.wrap{padding:22px 12px}.rounds{grid-template-columns:1fr}}
-</style><!-- Smartsupp Live Chat script -->
-<script type="text/javascript">
-var _smartsupp = _smartsupp || {};
-_smartsupp.key = 'beda616dd447f33383e535fee445f90330797c47';
-window.smartsupp||(function(d) {
-  var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
-  s=d.getElementsByTagName('script')[0];c=d.createElement('script');
-  c.type='text/javascript';c.charset='utf-8';c.async=true;
-  c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
-})(document);
-</script>
-<noscript>Powered by <a href="https://www.smartsupp.com" target="_blank">Smartsupp</a></noscript>
-</head><body><header class="nav"><div class="brand">Gaming API</div><a class="login" href="/login.html">Developer login</a></header><main class="wrap"><section class="intro"><div class="live"><span class="dot"></span><span id="connection">Connecting to live game</span></div><h1>Live Crash</h1><p>Watch the live round stream in real time. This public page is view-only — betting and premium crash data are not exposed here.</p></section><section class="board"><div class="top"><strong id="roundTitle">Waiting for round</strong><span class="state" id="state">CONNECTING</span></div><div class="multiplier"><div><strong id="multiplier">—</strong><small id="sub">Awaiting WebSocket data</small></div></div><section class="history"><h2>Recent rounds</h2><div id="rounds" class="rounds"><div class="empty">Waiting for round events from the WebSocket…</div></div></section><div class="note">The live multiplier and round status are read directly from the WebSocket. This page does not generate odds or crash values.</div></section></main><script>const WS_URL='wss://gaming-api-d7up.onrender.com/';const $=id=>document.getElementById(id);let socket=null,reconnectTimer=null;const history=[];function text(v){return v==null?'':String(v)}function number(v){const n=Number(v);return Number.isFinite(n)?n:null}function pick(o,keys){for(const k of keys){if(o&&o[k]!==undefined&&o[k]!==null)return o[k]}return null}function addRound(item){if(!item)return;const id=text(pick(item,['roundId','round_id','id','round']));const status=text(pick(item,['status','state','event'])).toUpperCase();const value=number(pick(item,['multiplier','currentMultiplier','current_multiplier','value']));const existing=history.find(x=>x.id&&id&&x.id===id);if(existing)Object.assign(existing,{status,value});else history.unshift({id:id||`round-${Date.now()}`,status:status||'UPDATE',value});history.splice(12);renderHistory()}function renderHistory(){const box=$('rounds');if(!history.length){box.innerHTML='<div class="empty">Waiting for round events from the WebSocket…</div>';return}box.innerHTML=history.map(r=>`<div class="round"><div class="id">${r.id||'Round'}</div><div class="status">${r.status||'UPDATE'}</div><div class="value">${r.value==null?'—':r.value.toFixed(2)+'×'}</div></div>`).join('')}function handle(raw){let data;try{data=JSON.parse(raw)}catch{return}const event=text(pick(data,['event','type','name'])).toLowerCase();const payload=data.data&&typeof data.data==='object'?data.data:data.payload&&typeof data.payload==='object'?data.payload:data;if(event.includes('connection'))return;const state=text(pick(payload,['status','state'])).toLowerCase()||event;const id=pick(payload,['roundId','round_id','id','round']);const value=number(pick(payload,['multiplier','currentMultiplier','current_multiplier','value']));if(id!=null)$('roundTitle').textContent='Round '+id;$('state').textContent=(state||'UPDATE').toUpperCase();if(value!=null){$('multiplier').textContent=value.toFixed(2)+'×';$('sub').textContent=state.includes('crash')?'Round crashed':state.includes('wait')?'Waiting for bets':'Live multiplier'}else if(state.includes('wait')){$('multiplier').textContent='—';$('sub').textContent='Waiting for next round'}addRound({id,status:state,value})}function connect(){clearTimeout(reconnectTimer);$('connection').textContent='Connecting to live game';$('state').textContent='CONNECTING';try{socket=new WebSocket(WS_URL)}catch{reconnect();return}socket.onopen=()=>{$('connection').textContent='Live WebSocket connected';$('state').textContent='CONNECTED'};socket.onmessage=e=>handle(e.data);socket.onerror=()=>{$('connection').textContent='WebSocket connection error'};socket.onclose=()=>{$('connection').textContent='Reconnecting to live game';$('state').textContent='OFFLINE';reconnect()}}function reconnect(){clearTimeout(reconnectTimer);reconnectTimer=setTimeout(connect,3000)}connect();</script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Gaming API — real-time game infrastructure, secure authentication and live crash WebSocket technology.">
+  <title>Gaming API — Real-Time Game Infrastructure</title>
+  <style>
+    :root{--bg:#050811;--panel:#0a1020;--panel2:#0d1527;--line:rgba(255,255,255,.09);--text:#f7f9fc;--muted:#93a1b5;--blue:#5b8cff;--violet:#8b5cf6;--green:#22c99a;--red:#ff6175;--gold:#f5c451;--max:1180px}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;line-height:1.6}
+    a{color:inherit;text-decoration:none}
+    button{font:inherit}
+    .nav{position:sticky;top:0;z-index:50;height:72px;border-bottom:1px solid var(--line);background:rgba(5,8,17,.82);backdrop-filter:blur(18px)}
+    .nav-inner{max-width:var(--max);height:100%;margin:auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{display:flex;align-items:center;gap:11px;font-weight:900;letter-spacing:.2px}
+    .brand-mark{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,var(--blue),var(--violet));box-shadow:0 10px 30px rgba(91,140,255,.24)}
+    .brand-mark span{font-size:16px;font-weight:1000}
+    .nav-links{display:flex;align-items:center;gap:25px;color:#aab5c7;font-size:13px}
+    .nav-links a:hover{color:#fff}
+    .nav-actions{display:flex;align-items:center;gap:9px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 16px;border-radius:10px;border:1px solid var(--line);background:#ffffff08;color:#fff;font-weight:800;font-size:12px;cursor:pointer;transition:.2s}
+    .btn:hover{transform:translateY(-1px);background:#ffffff0e}
+    .btn-primary{border:0;background:linear-gradient(135deg,var(--blue),#315eea);box-shadow:0 12px 28px rgba(49,94,234,.2)}
+    .hero{position:relative;overflow:hidden;padding:95px 22px 70px;text-align:center}
+    .hero:before{content:"";position:absolute;inset:-250px 0 auto;height:600px;background:radial-gradient(circle at 50% 30%,rgba(91,140,255,.18),transparent 58%);pointer-events:none}
+    .hero-inner{position:relative;max-width:900px;margin:auto}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid rgba(91,140,255,.2);border-radius:999px;background:rgba(91,140,255,.07);color:#a9c2ff;font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase}
+    .eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 14px var(--green)}
+    h1{font-size:clamp(42px,7vw,82px);line-height:1.02;letter-spacing:-4px;margin:24px 0 20px}
+    .gradient{background:linear-gradient(120deg,#fff 15%,#a8c2ff 55%,#b994ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .hero p{max-width:730px;margin:0 auto;color:var(--muted);font-size:17px;line-height:1.8}
+    .hero-actions{display:flex;justify-content:center;gap:11px;margin-top:30px;flex-wrap:wrap}
+    .stats{max-width:var(--max);margin:0 auto;padding:0 22px 70px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .stat{padding:23px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,#ffffff06,#ffffff02)}
+    .stat strong{display:block;font-size:28px;letter-spacing:-1px}.stat span{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+    .section{max-width:var(--max);margin:auto;padding:78px 22px}
+    .section-head{max-width:730px;margin-bottom:32px}.kicker{color:#8db0ff;font-size:11px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase}.section h2{font-size:clamp(30px,4vw,48px);line-height:1.1;letter-spacing:-2px;margin:9px 0 12px}.section-head p{color:var(--muted);margin:0;line-height:1.8}
+    .live-shell{border:1px solid var(--line);border-radius:24px;padding:16px;background:linear-gradient(145deg,#0d1628,#080d18);box-shadow:0 35px 100px rgba(0,0,0,.35)}
+    .live-top{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:6px 7px 16px}.live-title{font-weight:900}.live-status{display:flex;align-items:center;gap:7px;color:#9debd3;font-size:10px;font-weight:900;letter-spacing:1px}.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 13px var(--green)}
+    .live-grid{display:grid;grid-template-columns:1.65fr .75fr;gap:13px}
+    .screen{min-height:350px;display:grid;place-items:center;border:1px solid var(--line);border-radius:18px;background:radial-gradient(circle at 50% 42%,rgba(91,140,255,.12),transparent 43%),#060a13;position:relative;overflow:hidden}
+    .screen:after{content:"";position:absolute;left:8%;right:8%;top:50%;height:1px;background:linear-gradient(90deg,transparent,#ffffff12,transparent)}
+    .screen-content{position:relative;z-index:2;text-align:center}.round-label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1.5px}.multiplier{font-size:clamp(68px,10vw,120px);font-weight:1000;letter-spacing:-6px;line-height:1;margin:12px 0}.screen-sub{color:#718096;font-size:12px}
+    .side{display:grid;gap:13px}.mini{border:1px solid var(--line);border-radius:18px;padding:19px;background:#ffffff04}.mini-label{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px}.mini-value{font-size:25px;font-weight:900;margin-top:5px}.mini-note{color:#6e7b90;font-size:10px;margin-top:3px}
+    .history{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:13px}.round{padding:13px;border:1px solid var(--line);border-radius:12px;background:#ffffff04}.round-id{font-size:9px;color:#6e7b90}.round-status{font-size:10px;font-weight:900;margin-top:5px}.round-value{font-size:19px;font-weight:1000;margin-top:2px}
+    .notice{margin-top:13px;padding:12px 14px;border-radius:11px;background:#ffffff03;border:1px solid var(--line);color:#78869a;font-size:10px;text-align:center}
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.card{padding:25px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,#0c1424,#080d18)}.icon{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:#ffffff08;border:1px solid var(--line);font-weight:900}.card h3{margin:18px 0 8px;font-size:17px}.card p{margin:0;color:var(--muted);font-size:12px;line-height:1.75}
+    .feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.feature{padding:25px;border:1px solid var(--line);border-radius:17px;background:#ffffff03}.feature h3{margin:0 0 8px;font-size:17px}.feature p{margin:0;color:var(--muted);font-size:12px;line-height:1.8}.check{display:flex;gap:9px;margin-top:15px;color:#cbd5e1;font-size:11px}.check b{color:var(--green)}
+    .security{display:grid;grid-template-columns:1fr 1fr;gap:13px}.security-box{padding:26px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,#0d1527,#080d18)}.security-box h3{margin:0 0 8px}.security-box p{color:var(--muted);font-size:12px;line-height:1.8;margin:0}.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:17px}.pill{padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:#ffffff04;color:#b9c4d5;font-size:10px;font-weight:800}
+    .cta{margin:40px auto 90px;max-width:var(--max);padding:0 22px}.cta-inner{padding:60px 30px;text-align:center;border:1px solid rgba(91,140,255,.18);border-radius:24px;background:radial-gradient(circle at 50% 0,rgba(91,140,255,.15),transparent 60%),#0a1020}.cta h2{font-size:clamp(30px,5vw,50px);letter-spacing:-2px;margin:0 0 12px}.cta p{color:var(--muted);max-width:650px;margin:0 auto 25px;font-size:13px}
+    .faq{display:grid;gap:9px}.faq details{border:1px solid var(--line);border-radius:13px;background:#ffffff03;padding:17px 18px}.faq summary{cursor:pointer;font-weight:800;font-size:12px}.faq p{color:var(--muted);font-size:11px;line-height:1.8;margin:12px 0 0}
+    footer{border-top:1px solid var(--line);padding:35px 22px;color:#657287;font-size:10px}.footer-inner{max-width:var(--max);margin:auto;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    @media(max-width:850px){.nav-links{display:none}.stats{grid-template-columns:1fr 1fr}.live-grid,.security,.feature-grid{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}.history{grid-template-columns:1fr 1fr}}
+    @media(max-width:520px){.nav-actions .login-link{display:none}.hero{padding-top:65px}h1{letter-spacing:-2.5px}.stats,.cards{grid-template-columns:1fr}.section{padding-top:55px;padding-bottom:55px}.live-shell{padding:10px}.screen{min-height:280px}.history{grid-template-columns:1fr 1fr}.multiplier{letter-spacing:-4px}}
+  </style>
+
+  <!-- Smartsupp Live Chat -->
+  <script type="text/javascript">
+    var _smartsupp = _smartsupp || {};
+    _smartsupp.key = 'beda616dd447f33383e535fee445f90330797c47';
+    window.smartsupp||(function(d){var s,c,o=smartsupp=function(){o._.push(arguments)};o._=[];s=d.getElementsByTagName('script')[0];c=d.createElement('script');c.type='text/javascript';c.charset='utf-8';c.async=true;c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s)})(document);
+  </script>
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="#top"><span class="brand-mark"><span>G</span></span>Gaming API</a>
+      <nav class="nav-links">
+        <a href="#live">Live Game</a><a href="#platform">Platform</a><a href="#security">Security</a><a href="#faq">FAQ</a>
+      </nav>
+      <div class="nav-actions"><a class="btn login-link" href="/login.html">Sign in</a><a class="btn btn-primary" href="/login.html">Sign up</a></div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="eyebrow"><i></i> Real-time gaming infrastructure</div>
+        <h1>Build, connect and scale your <span class="gradient">Gaming API</span></h1>
+        <p>Modern game infrastructure for real-time experiences, secure authentication and live WebSocket data. Explore the platform, watch the live crash stream and create your developer account.</p>
+        <div class="hero-actions"><a class="btn btn-primary" href="/login.html">Create your account →</a><a class="btn" href="#live">Watch live rounds</a></div>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="stat"><strong>Real-time</strong><span>WebSocket event delivery</span></div>
+      <div class="stat"><strong>Secure</strong><span>Modern authentication stack</span></div>
+      <div class="stat"><strong>Developer-first</strong><span>API-ready architecture</span></div>
+      <div class="stat"><strong>24/7</strong><span>Live platform availability target</span></div>
+    </section>
+
+    <section class="section" id="live">
+      <div class="section-head"><div class="kicker">Live WebSocket</div><h2>Watch the game stream in real time</h2><p>This public demonstration reads round events directly from the Gaming API WebSocket. It is display-only: there are no betting controls, stake inputs or cash-out actions on this page.</p></div>
+      <div class="live-shell">
+        <div class="live-top"><div class="live-title">Live Crash Monitor</div><div class="live-status"><span class="live-dot"></span><span id="connection">Connecting…</span></div></div>
+        <div class="live-grid">
+          <div class="screen"><div class="screen-content"><div class="round-label" id="roundTitle">Waiting for round</div><div class="multiplier" id="multiplier">—</div><div class="screen-sub" id="sub">Awaiting WebSocket data</div></div></div>
+          <div class="side">
+            <div class="mini"><div class="mini-label">Connection</div><div class="mini-value" id="state">CONNECTING</div><div class="mini-note">Live event channel</div></div>
+            <div class="mini"><div class="mini-label">Current round</div><div class="mini-value" id="currentRound">—</div><div class="mini-note">Round identifier from server</div></div>
+            <div class="mini"><div class="mini-label">Stream</div><div class="mini-value">WebSocket</div><div class="mini-note">Read-only public display</div></div>
+          </div>
+        </div>
+        <div class="history" id="rounds"><div class="round"><div class="round-id">Waiting</div><div class="round-status">NO DATA</div><div class="round-value">—</div></div></div>
+        <div class="notice">The multiplier and round state are never generated by this page. They are rendered from events received from the live WebSocket server.</div>
+      </div>
+    </section>
+
+    <section class="section" id="platform">
+      <div class="section-head"><div class="kicker">Platform</div><h2>One foundation for your gaming experience</h2><p>Build your player-facing experience around dependable real-time infrastructure, account security and modular game services.</p></div>
+      <div class="cards">
+        <article class="card"><div class="icon">01</div><h3>Real-time game events</h3><p>Stream round state, game events and live updates through a WebSocket connection designed for responsive browser experiences.</p></article>
+        <article class="card"><div class="icon">02</div><h3>Developer authentication</h3><p>Email authentication, Google, GitHub, passkeys, email verification and additional account security are part of the platform journey.</p></article>
+        <article class="card"><div class="icon">03</div><h3>API-ready architecture</h3><p>Keep the public interface separate from server-side logic so credentials, privileged operations and sensitive game logic stay protected.</p></article>
+        <article class="card"><div class="icon">04</div><h3>Player dashboard</h3><p>A secure authenticated area for account management, security settings, API features and future developer tools.</p></article>
+        <article class="card"><div class="icon">05</div><h3>Live support</h3><p>Integrated support chat gives users a direct channel for assistance while they explore the platform.</p></article>
+        <article class="card"><div class="icon">06</div><h3>Expandable game layer</h3><p>The frontend can grow into additional game experiences, including the planned football and Shadow-style sections.</p></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><div class="kicker">How it works</div><h2>From connection to live experience</h2><p>The public homepage stays lightweight while the backend remains responsible for authoritative data and protected operations.</p></div>
+      <div class="feature-grid">
+        <div class="feature"><h3>1. Connect</h3><p>The browser opens the configured WebSocket connection and waits for server events.</p><div class="check"><b>✓</b> Automatic reconnect when the connection closes</div></div>
+        <div class="feature"><h3>2. Receive</h3><p>Incoming JSON events are parsed and mapped to round identifiers, state and multiplier values.</p><div class="check"><b>✓</b> Server data remains the source of truth</div></div>
+        <div class="feature"><h3>3. Display</h3><p>The live monitor updates without reloading the page, while recent events are retained for a quick visual history.</p><div class="check"><b>✓</b> Responsive desktop and mobile layout</div></div>
+        <div class="feature"><h3>4. Expand</h3><p>Additional game views and developer features can be added without exposing private credentials in the browser.</p><div class="check"><b>✓</b> Designed for future platform modules</div></div>
+      </div>
+    </section>
+
+    <section class="section" id="security">
+      <div class="section-head"><div class="kicker">Account security</div><h2>Authentication built for modern users</h2><p>Your account system is being designed around multiple secure authentication methods and stronger protection for sensitive accounts.</p></div>
+      <div class="security">
+        <div class="security-box"><h3>Multiple ways to sign in</h3><p>Users can use the authentication method that fits their device and account setup, while the platform keeps the sensitive authentication work on the backend.</p><div class="pills"><span class="pill">Email + Password</span><span class="pill">Google</span><span class="pill">GitHub</span><span class="pill">Passkey</span><span class="pill">Email OTP</span><span class="pill">WhatsApp OTP</span></div></div>
+        <div class="security-box"><h3>Additional account protection</h3><p>Users who configure an authenticator can be challenged with TOTP during login. New users can be prompted to strengthen their account after reaching the dashboard.</p><div class="pills"><span class="pill">Google Authenticator</span><span class="pill">TOTP</span><span class="pill">Recovery codes</span><span class="pill">Email verification</span></div></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><div class="kicker">Built to grow</div><h2>A frontend that can become the whole platform</h2><p>We are starting with the live crash experience and secure account layer. Future sections can introduce football, Shadow-style game views, developer documentation and additional real-time services.</p></div>
+      <div class="cards">
+        <article class="card"><h3>Crash</h3><p>Live round visualization powered by the WebSocket event stream.</p></article>
+        <article class="card"><h3>Football</h3><p>A dedicated future section for football experiences and live data presentation.</p></article>
+        <article class="card"><h3>Shadow</h3><p>A future game presentation layer designed to sit alongside the live game ecosystem.</p></article>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="section-head"><div class="kicker">FAQ</div><h2>Questions, answered</h2></div>
+      <div class="faq">
+        <details><summary>Can visitors place a bet from this homepage?</summary><p>No. The public homepage is intentionally view-only. It displays live WebSocket data but contains no betting controls.</p></details>
+        <details><summary>Where does the live multiplier come from?</summary><p>The page reads the configured WebSocket stream and renders values received from the server. It does not calculate or invent multiplier values.</p></details>
+        <details><summary>Can the homepage work on a phone?</summary><p>Yes. The layout is responsive and the live monitor adapts to smaller screens.</p></details>
+        <details><summary>Can I create an account from the homepage?</summary><p>Yes. The Sign up buttons take users to the secure authentication page.</p></details>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="cta-inner"><h2>Ready to enter the platform?</h2><p>Create your account and continue into the secure Gaming API experience. The public page remains open for everyone to explore.</p><a class="btn btn-primary" href="/login.html">Sign up for Gaming API →</a></div>
+    </section>
+  </main>
+
+  <footer><div class="footer-inner"><div>© 2026 Gaming API. All rights reserved.</div><div>Real-time infrastructure · Secure authentication · Developer platform</div></div></footer>
+
+  <script>
+    const WS_URL='wss://gaming-api-d7up.onrender.com/';
+    const $=id=>document.getElementById(id);
+    let socket=null,reconnectTimer=null;
+    const history=[];
+    const text=v=>v==null?'':String(v);
+    const number=v=>{const n=Number(v);return Number.isFinite(n)?n:null};
+    function pick(o,keys){for(const k of keys){if(o&&o[k]!==undefined&&o[k]!==null)return o[k]}return null}
+    function renderHistory(){const box=$('rounds');if(!history.length){box.innerHTML='<div class="round"><div class="round-id">Waiting</div><div class="round-status">NO DATA</div><div class="round-value">—</div></div>';return}box.innerHTML=history.map(r=>`<div class="round"><div class="round-id">${escapeHtml(r.id||'Round')}</div><div class="round-status">${escapeHtml((r.status||'UPDATE').toUpperCase())}</div><div class="round-value">${r.value==null?'—':r.value.toFixed(2)+'×'}</div></div>`).join('')}
+    function escapeHtml(v){return text(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+    function addRound(item){if(!item)return;const id=text(item.id),status=text(item.status).toUpperCase(),value=number(item.value);const existing=history.find(x=>x.id&&id&&x.id===id);if(existing)Object.assign(existing,{status,value});else history.unshift({id:id||`round-${Date.now()}`,status:status||'UPDATE',value});history.splice(8);renderHistory()}
+    function handle(raw){let data;try{data=typeof raw==='string'?JSON.parse(raw):raw}catch{return}const event=text(pick(data,['event','type','name'])).toLowerCase();const payload=data&&data.data&&typeof data.data==='object'?data.data:data&&data.payload&&typeof data.payload==='object'?data.payload:data;const state=text(pick(payload,['status','state'])).toLowerCase()||event;const id=pick(payload,['roundId','round_id','id','round']);const value=number(pick(payload,['multiplier','currentMultiplier','current_multiplier','value']));if(id!=null){$('roundTitle').textContent='Round '+text(id);$('currentRound').textContent=text(id)}$('state').textContent=(state||'UPDATE').toUpperCase();if(value!=null){$('multiplier').textContent=value.toFixed(2)+'×';$('sub').textContent=state.includes('crash')?'Round crashed':state.includes('wait')?'Waiting for next round':'Live multiplier'}else if(state.includes('wait')){$('multiplier').textContent='—';$('sub').textContent='Waiting for next round'}addRound({id,status:state,value})}
+    function connect(){clearTimeout(reconnectTimer);$('connection').textContent='Connecting…';$('state').textContent='CONNECTING';try{socket=new WebSocket(WS_URL)}catch(e){reconnect();return}socket.onopen=()=>{$('connection').textContent='Live WebSocket connected';$('state').textContent='CONNECTED'};socket.onmessage=e=>handle(e.data);socket.onerror=()=>{$('connection').textContent='WebSocket connection error'};socket.onclose=()=>{$('connection').textContent='Reconnecting…';$('state').textContent='OFFLINE';reconnect()}}
+    function reconnect(){clearTimeout(reconnectTimer);reconnectTimer=setTimeout(connect,3000)}
+    connect();
+  </script>
+</body>
+</html>
