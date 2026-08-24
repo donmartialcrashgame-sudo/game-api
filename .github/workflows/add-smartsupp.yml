@@ -1,0 +1,63 @@
+name: Add Smartsupp to HTML pages
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  add-smartsupp:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add Smartsupp to every HTML page
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          snippet = '''<!-- Smartsupp Live Chat script -->
+          <script type="text/javascript">
+          var _smartsupp = _smartsupp || {};
+          _smartsupp.key = 'beda616dd447f33383e535fee445f90330797c47';
+          window.smartsupp||(function(d) {
+            var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
+            s=d.getElementsByTagName('script')[0];c=d.createElement('script');
+            c.type='text/javascript';c.charset='utf-8';c.async=true;
+            c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
+          })(document);
+          </script>
+          <noscript>Powered by <a href="https://www.smartsupp.com" target="_blank">Smartsupp</a></noscript>'''
+
+          for path in Path('.').rglob('*.html'):
+              if '.git' in path.parts:
+                  continue
+              text = path.read_text(encoding='utf-8')
+              if '_smartsupp.key' in text:
+                  continue
+              if '</head>' not in text.lower():
+                  continue
+              pos = text.lower().find('</head>')
+              text = text[:pos] + snippet + '\n' + text[pos:]
+              path.write_text(text, encoding='utf-8')
+              print(f'Updated {path}')
+          PY
+
+      - name: Commit HTML changes and remove this workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add '*.html' .github/workflows/add-smartsupp.yml
+          git rm .github/workflows/add-smartsupp.yml
+          if git diff --cached --quiet; then
+            echo "No changes needed"
+            exit 0
+          fi
+          git commit -m "Add Smartsupp live chat to all HTML pages"
+          git push
+
+# Triggered from the repository so the changes are applied automatically.
