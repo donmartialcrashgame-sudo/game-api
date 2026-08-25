@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gaming API — API Documentation</title>
+<meta name="description" content="Gaming API documentation, endpoints, authentication, responses, limits and integration guidance.">
+<style>
+:root{--bg:#050811;--panel:#0b1220;--line:#ffffff12;--text:#f8fafc;--muted:#91a0b5;--blue:#4f8cff;--green:#20c997}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#4f8cff18,transparent 35%),var(--bg);color:var(--text);font-family:Arial,sans-serif;line-height:1.65}.nav{height:68px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:#070c16e8}.brand{font-weight:900}.nav a{color:#fff;text-decoration:none;margin-left:18px;font-size:13px}.wrap{max-width:1050px;margin:auto;padding:45px 20px 70px}.hero{text-align:center;margin-bottom:35px}.hero h1{font-size:clamp(34px,6vw,56px);margin:0 0 10px}.muted{color:var(--muted)}.card{padding:24px;margin:18px 0;border:1px solid var(--line);border-radius:18px;background:var(--panel)}h2{margin-top:0}code{padding:3px 7px;border-radius:6px;background:#ffffff0b;color:#9dc0ff}pre{overflow:auto;padding:18px;border-radius:12px;background:#03060c;border:1px solid var(--line);color:#d9e4f7}.endpoint{border-left:3px solid var(--blue);padding-left:15px}.badge{display:inline-block;padding:4px 8px;border-radius:6px;background:#20c99716;color:#70e4bf;font-size:11px;font-weight:800}.footer{padding-top:30px;color:#66748a;font-size:12px;text-align:center}ul{padding-left:20px}
+</style>
+<!-- Smartsupp Live Chat script -->
+<script type="text/javascript">
+var _smartsupp = _smartsupp || {};
+_smartsupp.key = 'beda616dd447f33383e535fee445f90330797c47';
+window.smartsupp||(function(d) {var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];s=d.getElementsByTagName('script')[0];c=d.createElement('script');c.type='text/javascript';c.charset='utf-8';c.async=true;c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);})(document);
+</script>
+</head>
+<body><header class="nav"><div class="brand">Gaming API</div><nav><a href="/">Home</a><a href="/login.html">Login</a></nav></header>
+<main class="wrap"><section class="hero"><h1>API Documentation</h1><p class="muted">Reference documentation for integrating with the Gaming API.</p></section>
+<section class="card"><h2>Overview</h2><p>The Gaming API provides programmatic access to supported gaming data and services. Use this documentation as the integration reference and always validate responses in your application.</p><p><span class="badge">HTTPS</span> Use secure HTTPS connections for API requests. Do not expose private credentials in browser-side code or public repositories.</p></section>
+<section class="card"><h2>Authentication</h2><p>Authenticated endpoints require a valid account/session or API credential where applicable. Keep credentials private and never place secret keys in client-side JavaScript.</p><pre>Authorization: Bearer YOUR_ACCESS_TOKEN
+Content-Type: application/json</pre></section>
+<section class="card"><h2>Example request</h2><div class="endpoint"><strong>GET</strong> <code>/api/endpoint</code></div><pre>curl -X GET "https://game-api.online/api/endpoint" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Accept: application/json"</pre><p class="muted">Replace the example endpoint and credential with the endpoint and authentication method provided for your account.</p></section>
+<section class="card"><h2>Response format</h2><p>Responses are returned as JSON where supported. Applications should handle HTTP status codes and unexpected fields gracefully.</p><pre>{
+  "success": true,
+  "data": {},
+  "message": "Request completed"
+}</pre></section>
+<section class="card"><h2>Errors</h2><ul><li><code>400</code> — Invalid request.</li><li><code>401</code> — Authentication required or invalid.</li><li><code>403</code> — Access denied.</li><li><code>404</code> — Resource not found.</li><li><code>429</code> — Rate limit exceeded.</li><li><code>500</code> — Server error.</li></ul></section>
+<section class="card"><h2>Usage and limits</h2><p>API access may be subject to authentication, rate limits, availability limits, account permissions, and service changes. Do not attempt to bypass security controls or rate limits.</p></section>
+<section class="card"><h2>Security</h2><p>Protect tokens and credentials, use HTTPS, validate API responses, and immediately rotate credentials if you believe they have been exposed.</p></section>
+<div class="footer">© 2026 Gaming API · <a href="/policy.html">Policy</a> · <a href="/agreement.html">Agreement</a></div></main></body></html>
