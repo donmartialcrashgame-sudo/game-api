@@ -1,33 +1,145 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Gaming API — API Documentation</title>
-<meta name="description" content="Gaming API documentation, endpoints, authentication, responses, limits and integration guidance.">
+<meta name="description" content="Gaming API developer documentation for API keys, authentication, requests, responses, limits and WebSocket integration.">
 <style>
-:root{--bg:#050811;--panel:#0b1220;--line:#ffffff12;--text:#f8fafc;--muted:#91a0b5;--blue:#4f8cff;--green:#20c997}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#4f8cff18,transparent 35%),var(--bg);color:var(--text);font-family:Arial,sans-serif;line-height:1.65}.nav{height:68px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:#070c16e8}.brand{font-weight:900}.nav a{color:#fff;text-decoration:none;margin-left:18px;font-size:13px}.wrap{max-width:1050px;margin:auto;padding:45px 20px 70px}.hero{text-align:center;margin-bottom:35px}.hero h1{font-size:clamp(34px,6vw,56px);margin:0 0 10px}.muted{color:var(--muted)}.card{padding:24px;margin:18px 0;border:1px solid var(--line);border-radius:18px;background:var(--panel)}h2{margin-top:0}code{padding:3px 7px;border-radius:6px;background:#ffffff0b;color:#9dc0ff}pre{overflow:auto;padding:18px;border-radius:12px;background:#03060c;border:1px solid var(--line);color:#d9e4f7}.endpoint{border-left:3px solid var(--blue);padding-left:15px}.badge{display:inline-block;padding:4px 8px;border-radius:6px;background:#20c99716;color:#70e4bf;font-size:11px;font-weight:800}.footer{padding-top:30px;color:#66748a;font-size:12px;text-align:center}ul{padding-left:20px}
+:root{--bg:#050811;--panel:#0b1220;--panel2:#0f1929;--line:#ffffff12;--text:#f8fafc;--muted:#91a0b5;--blue:#4f8cff;--blue2:#2563eb;--green:#20c997;--red:#ff6378;--yellow:#ffd27a}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 50% 0,#4f8cff18,transparent 35%),var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;line-height:1.65}.nav{height:68px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:#070c16e8;backdrop-filter:blur(12px);position:sticky;top:0;z-index:20}.brand{font-weight:900;letter-spacing:.2px}.nav a{color:#cbd5e1;text-decoration:none;margin-left:18px;font-size:13px}.nav a:hover{color:white}.wrap{max-width:1120px;margin:auto;padding:45px 20px 70px}.hero{text-align:center;margin-bottom:35px}.hero h1{font-size:clamp(34px,6vw,56px);margin:0 0 10px;line-height:1.05}.muted{color:var(--muted)}.hero .muted{max-width:680px;margin:auto}.toc{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:22px}.toc a{color:#a9c5ff;background:#4f8cff0d;border:1px solid #4f8cff20;border-radius:999px;padding:7px 11px;text-decoration:none;font-size:11px}.card{padding:25px;margin:18px 0;border:1px solid var(--line);border-radius:18px;background:var(--panel);box-shadow:0 20px 60px #00000018}.card h2{margin-top:0;font-size:22px}.card h3{font-size:15px;margin-top:25px}.badge{display:inline-block;padding:4px 8px;border-radius:6px;background:#20c99716;color:#70e4bf;font-size:11px;font-weight:800}.badge.blue{background:#4f8cff16;color:#9dbdff}.badge.yellow{background:#ffd27a14;color:#ffd27a}.endpoint{border-left:3px solid var(--blue);padding:13px 15px;background:#4f8cff08;border-radius:0 10px 10px 0;margin:15px 0}.method{font-weight:900;color:#70a1ff;margin-right:8px}.method.post{color:#70e4bf}.method.delete{color:#ff9aaa}code{padding:3px 7px;border-radius:6px;background:#ffffff0b;color:#9dc0ff;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}pre{overflow:auto;padding:18px;border-radius:12px;background:#03060c;border:1px solid var(--line);color:#d9e4f7;font-size:12px;line-height:1.65}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.mini{padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}.mini strong{display:block;margin-bottom:5px}.notice{padding:15px;border-radius:12px;margin:15px 0}.notice.info{background:#4f8cff0b;border:1px solid #4f8cff22}.notice.warn{background:#ffd27a0b;border:1px solid #ffd27a20;color:#e9d5a2}.notice.danger{background:#ff63780b;border:1px solid #ff637820;color:#ffb0bb}table{width:100%;border-collapse:collapse;margin:15px 0}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:12px}th{color:#718099;text-transform:uppercase;font-size:9px;letter-spacing:.8px}ul{padding-left:20px}.footer{padding-top:30px;color:#66748a;font-size:12px;text-align:center}.footer a{color:#91b5ff;text-decoration:none}
+@media(max-width:760px){.nav{padding:0 15px}.nav a{margin-left:9px;font-size:11px}.wrap{padding:30px 14px 55px}.card{padding:19px}.grid{grid-template-columns:1fr}pre{font-size:11px}}
 </style>
 <!-- Smartsupp Live Chat script -->
 <script type="text/javascript">
 var _smartsupp = _smartsupp || {};
 _smartsupp.key = 'beda616dd447f33383e535fee445f90330797c47';
-window.smartsupp||(function(d) {var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];s=d.getElementsByTagName('script')[0];c=d.createElement('script');c.type='text/javascript';c.charset='utf-8';c.async=true;c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);})(document);
+window.smartsupp||(function(d){var s,c,o=smartsupp=function(){o._.push(arguments)};o._=[];s=d.getElementsByTagName('script')[0];c=d.createElement('script');c.type='text/javascript';c.charset='utf-8';c.async=true;c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);})(document);
 </script>
 </head>
-<body><header class="nav"><div class="brand">Gaming API</div><nav><a href="/">Home</a><a href="/login.html">Login</a></nav></header>
-<main class="wrap"><section class="hero"><h1>API Documentation</h1><p class="muted">Reference documentation for integrating with the Gaming API.</p></section>
-<section class="card"><h2>Overview</h2><p>The Gaming API provides programmatic access to supported gaming data and services. Use this documentation as the integration reference and always validate responses in your application.</p><p><span class="badge">HTTPS</span> Use secure HTTPS connections for API requests. Do not expose private credentials in browser-side code or public repositories.</p></section>
-<section class="card"><h2>Authentication</h2><p>Authenticated endpoints require a valid account/session or API credential where applicable. Keep credentials private and never place secret keys in client-side JavaScript.</p><pre>Authorization: Bearer YOUR_ACCESS_TOKEN
-Content-Type: application/json</pre></section>
-<section class="card"><h2>Example request</h2><div class="endpoint"><strong>GET</strong> <code>/api/endpoint</code></div><pre>curl -X GET "https://game-api.online/api/endpoint" \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
-  -H "Accept: application/json"</pre><p class="muted">Replace the example endpoint and credential with the endpoint and authentication method provided for your account.</p></section>
-<section class="card"><h2>Response format</h2><p>Responses are returned as JSON where supported. Applications should handle HTTP status codes and unexpected fields gracefully.</p><pre>{
+<body>
+<header class="nav"><div class="brand">Gaming API</div><nav><a href="/">Home</a><a href="/login.html">Login</a><a href="/api-keys.html">API Keys</a></nav></header>
+<main class="wrap">
+<section class="hero">
+<h1>API Documentation</h1>
+<p class="muted">Everything you need to authenticate your application, use Gaming API credentials safely, understand responses and integrate supported real-time services.</p>
+<div class="toc"><a href="#authentication">Authentication</a><a href="#keys">API Keys</a><a href="#requests">Requests</a><a href="#responses">Responses</a><a href="#limits">Limits</a><a href="#websocket">WebSocket</a><a href="#errors">Errors</a><a href="#security">Security</a></div>
+</section>
+
+<section class="card" id="authentication">
+<h2>Authentication</h2>
+<p>Gaming API uses authenticated credentials to identify applications. Your dashboard account session is used for protected developer-console actions such as creating and managing API keys.</p>
+<div class="notice info"><strong>Dashboard authentication</strong><br><span class="muted">Sign in through the Gaming API login page. OAuth, email authentication, passkeys and configured MFA are handled by the authentication flow.</span></div>
+<p>For application-to-API requests, use an API key generated from the <a href="/api-keys.html" style="color:#9dbdff">API Keys</a> page. Keep the secret on your server and send it only over HTTPS.</p>
+</section>
+
+<section class="card" id="keys">
+<h2>API Keys</h2>
+<p>API keys are application credentials. The secret is generated by the backend and shown once after creation. The original secret is not stored in the database; the backend stores a one-way hash for validation.</p>
+<div class="grid">
+<div class="mini"><strong>Create</strong><span class="muted">Open API Keys and choose Create new key.</span></div>
+<div class="mini"><strong>Store</strong><span class="muted">Save the secret in a server-side environment variable or secret manager.</span></div>
+<div class="mini"><strong>Revoke</strong><span class="muted">Immediately revoke a credential that is exposed or no longer needed.</span></div>
+</div>
+<h3>Recommended header</h3>
+<pre>Authorization: Bearer gapi_YOUR_API_KEY
+Accept: application/json</pre>
+<div class="notice warn"><strong>Never expose your API secret</strong><br>Do not place a secret API key in frontend JavaScript, HTML, mobile-app source code, screenshots or public GitHub repositories.</div>
+</section>
+
+<section class="card" id="requests">
+<h2>Requests</h2>
+<p>Use HTTPS for all production API requests. Send JSON when an endpoint expects a request body and include the authentication header for protected endpoints.</p>
+<div class="endpoint"><span class="method">GET</span><code>/api/endpoint</code></div>
+<pre>curl -X GET "https://game-api.online/api/endpoint" \
+  -H "Authorization: Bearer gapi_YOUR_API_KEY" \
+  -H "Accept: application/json"</pre>
+<p class="muted">The example endpoint above is a documentation placeholder. Use the specific endpoint made available for your Gaming API account.</p>
+<h3>Server-side JavaScript example</h3>
+<pre>const response = await fetch("https://game-api.online/api/endpoint", {
+  headers: {
+    Authorization: `Bearer ${process.env.GAMING_API_KEY}`,
+    Accept: "application/json"
+  }
+});
+
+const data = await response.json();</pre>
+</section>
+
+<section class="card" id="responses">
+<h2>Response format</h2>
+<p>JSON responses should be handled defensively. A successful response may contain application data and a message, while errors return an appropriate HTTP status.</p>
+<pre>{
   "success": true,
   "data": {},
   "message": "Request completed"
-}</pre></section>
-<section class="card"><h2>Errors</h2><ul><li><code>400</code> — Invalid request.</li><li><code>401</code> — Authentication required or invalid.</li><li><code>403</code> — Access denied.</li><li><code>404</code> — Resource not found.</li><li><code>429</code> — Rate limit exceeded.</li><li><code>500</code> — Server error.</li></ul></section>
-<section class="card"><h2>Usage and limits</h2><p>API access may be subject to authentication, rate limits, availability limits, account permissions, and service changes. Do not attempt to bypass security controls or rate limits.</p></section>
-<section class="card"><h2>Security</h2><p>Protect tokens and credentials, use HTTPS, validate API responses, and immediately rotate credentials if you believe they have been exposed.</p></section>
-<div class="footer">© 2026 Gaming API · <a href="/policy.html">Policy</a> · <a href="/agreement.html">Agreement</a></div></main></body></html>
+}</pre>
+<table><thead><tr><th>Status</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><code>200</code></td><td>Request completed successfully.</td></tr>
+<tr><td><code>201</code></td><td>Resource created successfully.</td></tr>
+<tr><td><code>400</code></td><td>The request is invalid or missing required data.</td></tr>
+<tr><td><code>401</code></td><td>The API key or authentication credential is missing or invalid.</td></tr>
+<tr><td><code>403</code></td><td>The credential is valid but access is not permitted.</td></tr>
+<tr><td><code>404</code></td><td>The requested resource or endpoint was not found.</td></tr>
+<tr><td><code>429</code></td><td>The applicable request limit has been exceeded.</td></tr>
+<tr><td><code>500</code></td><td>An unexpected server-side error occurred.</td></tr>
+</tbody></table>
+</section>
+
+<section class="card" id="limits">
+<h2>Usage and limits</h2>
+<p>API access is subject to service availability, account permissions and configured rate limits. Limits may vary by API product, account and deployment environment.</p>
+<div class="notice info"><strong>Important</strong><br><span class="muted">We are not publishing a fixed numeric request limit here until the production Gaming API backend has its final rate-limit policy. This prevents the documentation from promising a limit that the backend does not enforce.</span></div>
+<p>When a limit is reached, clients should respect the returned <code>429</code> response and use controlled retry/backoff logic rather than repeatedly sending requests.</p>
+</section>
+
+<section class="card" id="websocket">
+<h2>WebSocket / Live Game Data</h2>
+<p>The Gaming API frontend can display live round information from the real-time game service. WebSocket authentication and the final production WebSocket URL depend on the backend service that is deployed for the game engine.</p>
+<div class="notice warn"><strong>Production integration</strong><br>The final WebSocket URL and message schema will be documented here once the production WebSocket backend is connected to API-key validation. Do not invent or hard-code a WebSocket URL from the frontend.</div>
+<h3>Expected real-time message shape</h3>
+<pre>{
+  "type": "round",
+  "roundId": "...",
+  "status": "running",
+  "multiplier": 1.42,
+  "timestamp": "..."
+}</pre>
+<p class="muted">Treat the example as a schema illustration only until the live backend contract is finalized.</p>
+</section>
+
+<section class="card" id="errors">
+<h2>Errors</h2>
+<p>Handle errors explicitly and never display private credentials in logs or browser error messages.</p>
+<pre>{
+  "success": false,
+  "error": "Invalid API key"
+}</pre>
+<ul>
+<li><code>400</code> — Invalid request.</li>
+<li><code>401</code> — Authentication required or API key invalid/revoked.</li>
+<li><code>403</code> — Access denied.</li>
+<li><code>404</code> — Resource not found.</li>
+<li><code>429</code> — Rate limit exceeded.</li>
+<li><code>500</code> — Server error.</li>
+</ul>
+</section>
+
+<section class="card" id="security">
+<h2>Security</h2>
+<ul>
+<li>Use HTTPS in production.</li>
+<li>Keep API secrets on your backend, never in browser code.</li>
+<li>Use environment variables or a dedicated secret manager.</li>
+<li>Rotate or revoke exposed credentials immediately.</li>
+<li>Do not commit API secrets to GitHub.</li>
+<li>Validate server responses and handle authentication failures safely.</li>
+<li>Use rate limiting and retry backoff where appropriate.</li>
+</ul>
+<div class="notice danger"><strong>Credential exposed?</strong><br>Revoke the affected key from the API Keys page and generate a replacement before continuing to use the application.</div>
+</section>
+
+<div class="footer">© 2026 Gaming API · <a href="/policy.html">Policy</a> · <a href="/agreement.html">Agreement</a> · <a href="/api-keys.html">API Keys</a></div>
+</main>
+</body>
+</html>
