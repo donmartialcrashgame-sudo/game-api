@@ -11,6 +11,21 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://game-api.online/projects.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://game-api.online/usage.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://game-api.online/authentication.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://game-api.online/policy.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
