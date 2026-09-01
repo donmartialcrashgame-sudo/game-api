@@ -1,9 +1,12 @@
 User-agent: *
 Allow: /
+Disallow: /login.html
 Disallow: /dashboard.html
+Disallow: /settings.html
 Disallow: /callback.html
 Disallow: /verify-mfa.html
 Disallow: /mfa-setup.html
 Disallow: /passkey-setup.html
+Disallow: /reset-password.html
 
 Sitemap: https://game-api.online/sitemap.xml
