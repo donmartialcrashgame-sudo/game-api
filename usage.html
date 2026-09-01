@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Gaming API usage documentation — integration guide, authentication, live events, examples, security and troubleshooting.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<title>Gaming API — Usage & Documentation</title>
+<style>
+:root{--bg:#050811;--panel:#0b1220;--panel2:#0e1727;--line:#ffffff12;--line2:#ffffff1d;--text:#f8fafc;--muted:#91a0b5;--blue:#4f8cff;--blue2:#2563eb;--violet:#8b5cf6;--green:#20c997;--amber:#f5b942;--red:#ff6b7a;--shadow:0 25px 80px #0008}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 12% 0,#4f8cff18,transparent 28%),radial-gradient(circle at 88% 20%,#8b5cf614,transparent 30%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;line-height:1.65}a{color:inherit;text-decoration:none}button{font:inherit}
+.nav{position:sticky;top:0;z-index:50;height:70px;padding:0 5%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:#050811e8;backdrop-filter:blur(18px)}.brand{display:flex;align-items:center;gap:10px;font-weight:900}.brand-mark{width:36px;height:36px;display:grid;place-items:center;border-radius:11px;background:linear-gradient(135deg,var(--blue),var(--violet));box-shadow:0 10px 30px #4f8cff33}.nav-links{display:flex;gap:22px;color:#aab6c8;font-size:13px}.nav-links a:hover{color:#fff}.nav-actions{display:flex;gap:9px}.btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 15px;border-radius:10px;border:1px solid #ffffff20;font-size:12px;font-weight:800;transition:.2s}.btn:hover{transform:translateY(-1px);border-color:#ffffff38}.primary{background:linear-gradient(135deg,var(--blue),var(--blue2));border-color:transparent}.ghost{background:#ffffff08}.container{width:min(1180px,92%);margin:auto}
+.hero{padding:78px 0 55px}.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid #20c99730;background:#20c9970b;border-radius:999px;color:#8ee8cd;font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase}.pulse{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 16px var(--green);animation:pulse 1.7s infinite}@keyframes pulse{50%{opacity:.35;transform:scale(.75)}}h1{max-width:900px;font-size:clamp(42px,6.5vw,74px);line-height:.99;letter-spacing:-4px;margin:20px 0 18px}h1 span{background:linear-gradient(100deg,#fff,var(--blue),#b69cff);-webkit-background-clip:text;background-clip:text;color:transparent}.hero p{max-width:780px;color:var(--muted);font-size:16px}.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px}.livebar{margin-top:35px;display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:17px;overflow:hidden;background:#ffffff04}.live-stat{padding:18px 20px;border-right:1px solid var(--line)}.live-stat:last-child{border-right:0}.live-stat strong{display:block;font-size:18px}.live-stat span{color:var(--muted);font-size:10px}
+.layout{display:grid;grid-template-columns:235px 1fr;gap:28px;align-items:start}.toc{position:sticky;top:92px;padding:18px;border:1px solid var(--line);border-radius:17px;background:#ffffff03}.toc-title{font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:#75a6ff;margin-bottom:10px}.toc a{display:block;color:var(--muted);font-size:12px;padding:8px 9px;border-radius:8px}.toc a:hover{background:#ffffff08;color:#fff}.content section{scroll-margin-top:92px;margin-bottom:70px}.kicker{color:#75a6ff;font-size:10px;font-weight:900;letter-spacing:1.3px;text-transform:uppercase}.content h2{font-size:clamp(28px,4vw,43px);line-height:1.08;letter-spacing:-2px;margin:8px 0 12px}.content h3{font-size:18px;margin:28px 0 9px}.content p,.content li{color:var(--muted);font-size:13px}.content ul,.content ol{padding-left:20px}.panel{padding:24px;border:1px solid var(--line);border-radius:19px;background:linear-gradient(180deg,#0c1423,#080e19);box-shadow:0 15px 50px #0004}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.mini{padding:19px;border:1px solid var(--line);border-radius:15px;background:#ffffff03}.mini strong{display:block;font-size:14px;margin-bottom:5px}.mini p{margin:0}.badge{display:inline-flex;padding:4px 8px;border-radius:999px;background:#4f8cff12;border:1px solid #4f8cff25;color:#8db5ff;font-size:9px;font-weight:900;letter-spacing:.6px}.good{color:#8ee8cd}.warn{color:#ffd98a}.danger{color:#ff9ba6}
+.code-wrap{border:1px solid var(--line2);border-radius:15px;overflow:hidden;background:#060b14;margin:17px 0}.code-head{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-bottom:1px solid var(--line);color:#7e8ca1;font-size:10px}.copy{border:1px solid #ffffff18;background:#ffffff08;color:#cbd5e1;border-radius:7px;padding:5px 8px;font-size:10px;cursor:pointer}.copy:hover{background:#ffffff12}pre{margin:0;padding:18px;overflow:auto;color:#dbe7ff;font:12px/1.75 ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}code{font-family:inherit;color:#dbe7ff;background:#ffffff08;border-radius:5px;padding:2px 5px}.code-wrap pre code{background:none;padding:0}
+.step{display:grid;grid-template-columns:36px 1fr;gap:14px;margin:17px 0}.step-num{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:#4f8cff14;border:1px solid #4f8cff28;color:#9bc0ff;font-weight:900;font-size:12px}.step h3{margin:0 0 4px;font-size:15px}.step p{margin:0}.table{width:100%;border-collapse:collapse;margin-top:15px;font-size:12px}.table th,.table td{text-align:left;padding:12px;border-bottom:1px solid var(--line)}.table th{color:#dbe4f2;font-size:10px;text-transform:uppercase;letter-spacing:.7px}.table td{color:var(--muted)}
+.live-console{padding:20px;border:1px solid #20c99725;border-radius:19px;background:radial-gradient(circle at 80% 0,#20c9970b,transparent 45%),#081019}.console-top{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:14px}.connection{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:900}.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 14px var(--green)}.dot.checking{background:var(--amber);box-shadow:0 0 14px var(--amber)}.dot.offline{background:var(--red);box-shadow:0 0 14px var(--red)}.console-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.metric{padding:14px;border:1px solid var(--line);border-radius:11px;background:#ffffff04}.metric span{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.7px}.metric strong{display:block;font-size:16px;margin-top:4px}.event-log{margin-top:12px;max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:11px;background:#050a11}.event{display:flex;justify-content:space-between;gap:15px;padding:10px 12px;border-bottom:1px solid var(--line);font:10px ui-monospace,SFMono-Regular,Consolas,monospace}.event:last-child{border-bottom:0}.event span:first-child{color:#8ea5c3}.event span:last-child{color:#b7c9e2;text-align:right}.note{margin-top:12px;padding:12px 14px;border-left:3px solid var(--blue);background:#4f8cff08;color:#91a0b5;font-size:11px}
+.faq details{padding:16px 18px;border:1px solid var(--line);border-radius:13px;background:#ffffff03;margin-bottom:9px}.faq summary{cursor:pointer;font-size:12px;font-weight:800}.faq p{margin:10px 0 0}.footer{padding:55px 0 70px;border-top:1px solid var(--line);color:#69778b;font-size:11px}.footer-row{display:flex;justify-content:space-between;gap:20px}.footer-links{display:flex;gap:18px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.toc{position:relative;top:auto}.grid3{grid-template-columns:1fr}.livebar{grid-template-columns:1fr 1fr}.live-stat:nth-child(2){border-right:0}.live-stat:nth-child(-n+2){border-bottom:1px solid var(--line)}}@media(max-width:650px){.nav-links{display:none}.nav{padding:0 14px}.hero{padding-top:55px}.grid2,.console-grid{grid-template-columns:1fr}.livebar{grid-template-columns:1fr}.live-stat{border-right:0!important;border-bottom:1px solid var(--line)}.live-stat:last-child{border-bottom:0}.footer-row{flex-direction:column}}
+</style>
+</head>
+<body>
+<header class="nav">
+<a class="brand" href="/"><span class="brand-mark">G</span><span>Gaming API</span></a>
+<nav class="nav-links"><a href="/#live">Live</a><a href="#quickstart">Quick start</a><a href="#authentication">Auth</a><a href="#websocket">WebSocket</a><a href="#faq">FAQ</a></nav>
+<div class="nav-actions"><a class="btn ghost" href="/login.html">Sign in</a><a class="btn primary" href="/login.html?mode=signup">Sign up</a></div>
+</header>
+<main>
+<section class="hero container">
+<div class="eyebrow"><span class="pulse"></span> Developer documentation</div>
+<h1>Use Gaming API to build a <span>live gaming experience</span></h1>
+<p>This guide explains the current platform structure, account flow, live game events, browser integration, security boundaries, error handling and the recommended way to build against Gaming API.</p>
+<div class="hero-actions"><a class="btn primary" href="#quickstart">Start with Quick Start →</a><a class="btn ghost" href="#websocket">View live events</a></div>
+<div class="livebar"><div class="live-stat"><strong id="clock">--:--:--</strong><span>Documentation clock</span></div><div class="live-stat"><strong class="good">Live monitor</strong><span>Public read-only experience</span></div><div class="live-stat"><strong>WebSocket</strong><span>Real-time event architecture</span></div><div class="live-stat"><strong id="updated">Checking…</strong><span>Site health check</span></div></div>
+</section>
+<div class="container layout">
+<aside class="toc"><div class="toc-title">On this page</div><a href="#overview">1. Overview</a><a href="#quickstart">2. Quick start</a><a href="#authentication">3. Authentication</a><a href="#requests">4. Requests & responses</a><a href="#websocket">5. Live WebSocket</a><a href="#events">6. Event model</a><a href="#security">7. Security</a><a href="#errors">8. Errors & retries</a><a href="#production">9. Production checklist</a><a href="#faq">10. FAQ</a></aside>
+<div class="content">
+<section id="overview">
+<div class="kicker">01 · Overview</div><h2>What Gaming API is</h2>
+<p>Gaming API is a developer-facing foundation for live gaming features. The current site combines a public live-game presentation, account authentication and a protected developer dashboard. The homepage is intentionally view-only: it can display live round information without exposing betting controls or private credentials.</p>
+<div class="grid3"><div class="mini"><span class="badge">LIVE</span><strong>Real-time events</strong><p>Use an event-driven WebSocket architecture when your application needs round state changes without constant polling.</p></div><div class="mini"><span class="badge">AUTH</span><strong>Protected accounts</strong><p>Account features are handled through authenticated sessions, with support for stronger factors such as MFA and passkeys.</p></div><div class="mini"><span class="badge">FRONTEND</span><strong>Presentation layer</strong><p>Keep browser code responsible for displaying data. Authoritative game logic and secrets should remain server-side.</p></div></div>
+<div class="note"><strong>Important:</strong> The public documentation describes the current frontend architecture. Do not treat example URLs, event names or payloads below as a guarantee of a production API contract unless those values are published by your backend.</div>
+</section>
+
+<section id="quickstart">
+<div class="kicker">02 · Quick start</div><h2>Get your integration organized</h2><p>A reliable integration starts by separating public configuration from secrets and by treating the server as the source of truth.</p>
+<div class="step"><div class="step-num">01</div><div><h3>Create an account</h3><p>Open the sign-up flow, verify your email when required, then enter the protected dashboard.</p></div></div>
+<div class="step"><div class="step-num">02</div><div><h3>Secure the account</h3><p>Add a passkey or Google Authenticator from the security flow. MFA should be preferred for developer accounts that control production integrations.</p></div></div>
+<div class="step"><div class="step-num">03</div><div><h3>Choose your integration layer</h3><p>Use normal HTTPS requests for request/response operations and WebSocket events for continuously changing game state.</p></div></div>
+<div class="step"><div class="step-num">04</div><div><h3>Keep credentials off the browser</h3><p>Private API secrets belong in your server environment. Never hard-code privileged keys into HTML, JavaScript bundles or public repositories.</p></div></div>
+<div class="code-wrap"><div class="code-head"><span>Browser-safe configuration pattern</span><button class="copy" data-copy="code-config">Copy</button></div><pre><code id="code-config">const API_BASE_URL = 'https://game-api.online';
+
+// Public configuration only.
+// Keep private API keys on your server.
+const config = {
+  baseUrl: API_BASE_URL,
+  transport: 'https + websocket'
+};</code></pre></div>
+</section>
+
+<section id="authentication">
+<div class="kicker">03 · Authentication</div><h2>Protect identity before API access</h2>
+<p>The current dashboard checks the authenticated Supabase session and displays the account email and authenticator assurance level. The project also contains dedicated flows for MFA setup, MFA verification, passkey setup and OAuth-style sign-in providers.</p>
+<div class="grid2"><div class="panel"><h3>Recommended account flow</h3><ol><li>Register or sign in.</li><li>Verify the account where required.</li><li>Check the active session before loading protected data.</li><li>Use MFA or a passkey for stronger protection.</li><li>Sign out when a shared device is no longer trusted.</li></ol></div><div class="panel"><h3>Authentication states</h3><table class="table"><tr><th>State</th><th>Meaning</th></tr><tr><td>Unauthenticated</td><td>No valid session is available.</td></tr><tr><td>Authenticated</td><td>A valid account session exists.</td></tr><tr><td>MFA / AAL2</td><td>A stronger authenticator assurance level has been reached.</td></tr><tr><td>Expired</td><td>Refresh or sign in again before protected operations.</td></tr></table></div></div>
+<div class="code-wrap"><div class="code-head"><span>Session check concept</span><button class="copy" data-copy="code-auth">Copy</button></div><pre><code id="code-auth">const { data, error } = await supabase.auth.getSession();
+
+if (error || !data.session) {
+  // Redirect to your sign-in page.
+  location.href = '/login.html';
+}
+
+// Never place a privileged server secret here.</code></pre></div>
+</section>
+
+<section id="requests">
+<div class="kicker">04 · Requests & responses</div><h2>Use HTTPS for discrete operations</h2>
+<p>Request/response APIs are best for operations where the client asks for a specific resource and receives a finite response. Your backend should validate authentication, authorization, input shape and rate limits before performing privileged work.</p>
+<div class="grid2"><div class="panel"><h3>Request checklist</h3><ul><li>Use HTTPS in production.</li><li>Send the minimum required fields.</li><li>Validate values on the server, not only in the browser.</li><li>Use an idempotency strategy for operations that may be retried.</li><li>Log a request ID rather than sensitive credentials.</li></ul></div><div class="panel"><h3>Response checklist</h3><ul><li>Return predictable JSON structures.</li><li>Use meaningful HTTP status codes.</li><li>Return machine-readable error codes.</li><li>Never return private secrets.</li><li>Include enough information for safe retry decisions.</li></ul></div></div>
+<div class="code-wrap"><div class="code-head"><span>Generic request pattern</span><button class="copy" data-copy="code-fetch">Copy</button></div><pre><code id="code-fetch">const response = await fetch(`${API_BASE_URL}/your-endpoint`, {
+  method: 'GET',
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+
+if (!response.ok) {
+  throw new Error(`Request failed: ${response.status}`);
+}
+
+const data = await response.json();</code></pre></div>
+<p class="note">Replace <code>/your-endpoint</code> with an endpoint that your backend actually exposes. The frontend repository currently does not publish a complete REST endpoint catalog, so invented endpoint paths should not be copied into production.</p>
+</section>
+
+<section id="websocket">
+<div class="kicker">05 · Live WebSocket</div><h2>Subscribe to changing game state</h2>
+<p>The public homepage is designed around a live WebSocket game monitor. A WebSocket is useful when the server needs to push round lifecycle changes to connected clients without requiring a new HTTP request for every update.</p>
+<div class="live-console">
+<div class="console-top"><div class="connection"><span class="dot checking" id="siteDot"></span><span id="siteStatus">Checking game-api.online…</span></div><span class="badge" id="latency">MEASURING</span></div>
+<div class="console-grid"><div class="metric"><span>Current time</span><strong id="liveClock">--:--:--</strong></div><div class="metric"><span>Page heartbeat</span><strong id="heartbeat">Waiting</strong></div><div class="metric"><span>Last check</span><strong id="lastCheck">—</strong></div></div>
+<div class="event-log" id="eventLog"><div class="event"><span>system</span><span>Waiting for live documentation events…</span></div></div>
+<div class="note">This console performs a lightweight health check against the public website and updates the clock automatically. It does <strong>not</strong> pretend to be a connection to a private game WebSocket. Your application should connect to the actual WebSocket endpoint supplied by your backend configuration.</div>
+</div>
+<h3>Recommended WebSocket lifecycle</h3>
+<div class="grid3"><div class="mini"><strong>Connect</strong><p>Open one connection per application context where practical. Avoid creating a new socket on every render.</p></div><div class="mini"><strong>Subscribe</strong><p>After connection, send only the subscription message required by your published protocol.</p></div><div class="mini"><strong>Reconnect</strong><p>Use bounded exponential backoff with jitter when the connection closes unexpectedly.</p></div></div>
+<div class="code-wrap"><div class="code-head"><span>Generic WebSocket client pattern</span><button class="copy" data-copy="code-ws">Copy</button></div><pre><code id="code-ws">const socket = new WebSocket('wss://YOUR-PUBLISHED-WS-ENDPOINT');
+
+socket.addEventListener('open', () => {
+  console.log('connected');
+});
+
+socket.addEventListener('message', (event) => {
+  const message = JSON.parse(event.data);
+  // Validate the message before rendering it.
+  console.log(message);
+});
+
+socket.addEventListener('close', () => {
+  // Reconnect using bounded backoff.
+});</code></pre></div>
+</section>
+
+<section id="events">
+<div class="kicker">06 · Event model</div><h2>Design around round lifecycle events</h2>
+<p>A crash-style game commonly has a lifecycle such as waiting, running and crashed/settled. Your frontend should render the state it receives instead of trying to calculate an authoritative crash value locally.</p>
+<table class="table"><tr><th>Concept</th><th>Purpose</th><th>Client behavior</th></tr><tr><td>Round ID</td><td>Uniquely identifies a round.</td><td>Use it to correlate updates.</td></tr><tr><td>Status</td><td>Describes lifecycle state.</td><td>Change the UI according to the received state.</td></tr><tr><td>Multiplier</td><td>Current displayed game value.</td><td>Render the server-provided value.</td></tr><tr><td>Timestamp</td><td>Orders or measures events.</td><td>Use it for diagnostics and synchronization.</td></tr><tr><td>Settlement</td><td>Marks the completed round.</td><td>Move the round into recent history.</td></tr></table>
+<div class="note"><strong>Authority rule:</strong> the browser is not the source of truth for game outcomes. Never let a client-side multiplier, timer or animation determine a financial or game result.</div>
+</section>
+
+<section id="security">
+<div class="kicker">07 · Security</div><h2>Build the secure boundary first</h2>
+<div class="grid2"><div class="panel"><h3>Never expose</h3><ul><li>Service-role or administrative keys.</li><li>Database passwords.</li><li>Private signing secrets.</li><li>Payment provider secrets.</li><li>Privileged internal endpoints.</li><li>Recovery codes in logs or analytics.</li></ul></div><div class="panel"><h3>Always validate</h3><ul><li>Authentication and session freshness.</li><li>User authorization for each protected resource.</li><li>Input type, length and allowed values.</li><li>Origin and transport requirements where applicable.</li><li>Rate limits and abuse controls.</li><li>Server-side game state before sensitive actions.</li></ul></div></div>
+<p>The existing dashboard also provides a path toward stronger account security through Google Authenticator TOTP/MFA and passkeys. These controls protect the account; they do not replace server-side authorization for API operations.</p>
+</section>
+
+<section id="errors">
+<div class="kicker">08 · Errors & retries</div><h2>Make failures predictable</h2>
+<table class="table"><tr><th>Situation</th><th>Recommended action</th></tr><tr><td>401 / unauthenticated</td><td>Refresh the session or send the user through sign-in.</td></tr><tr><td>403 / forbidden</td><td>Do not retry blindly; check permissions and account state.</td></tr><tr><td>404 / not found</td><td>Verify the endpoint and resource identifier.</td></tr><tr><td>409 / conflict</td><td>Resolve state conflict or use an idempotency key where supported.</td></tr><tr><td>429 / rate limited</td><td>Respect retry information and back off.</td></tr><tr><td>5xx / server error</td><td>Retry safe/idempotent operations with bounded exponential backoff.</td></tr><tr><td>WebSocket close</td><td>Reconnect with jitter; do not create unlimited simultaneous sockets.</td></tr></table>
+<div class="code-wrap"><div class="code-head"><span>Simple bounded backoff</span><button class="copy" data-copy="code-retry">Copy</button></div><pre><code id="code-retry">let attempt = 0;
+
+function nextDelay() {
+  const base = Math.min(30000, 1000 * 2 ** attempt++);
+  const jitter = Math.random() * 500;
+  return base + jitter;
+}
+
+// Reset attempt = 0 after a successful connection.</code></pre></div>
+</section>
+
+<section id="production">
+<div class="kicker">09 · Production checklist</div><h2>Before you ship</h2>
+<div class="grid2"><div class="panel"><h3>Frontend</h3><ul><li>Use HTTPS and WSS.</li><li>Keep public configuration separate from secrets.</li><li>Handle loading, empty, error and disconnected states.</li><li>Clean up WebSocket listeners on page/component disposal.</li><li>Do not calculate authoritative game outcomes locally.</li></ul></div><div class="panel"><h3>Backend</h3><ul><li>Authenticate and authorize every protected operation.</li><li>Validate all client input.</li><li>Rate-limit public and authenticated endpoints.</li><li>Log request IDs and operational errors without sensitive data.</li><li>Keep game state authoritative on the server.</li></ul></div></div>
+<div class="panel" style="margin-top:14px"><h3>Operational monitoring</h3><p>Track connection counts, WebSocket disconnects, event delivery failures, HTTP latency, error rates and authentication failures. Alert on sustained changes rather than isolated client-side errors.</p></div>
+</section>
+
+<section id="faq" class="faq">
+<div class="kicker">10 · FAQ</div><h2>Frequently asked questions</h2>
+<details open><summary>Is the public homepage an API key or developer console?</summary><p>No. The homepage is a public presentation layer. Private account and developer features belong behind authentication.</p></details>
+<details><summary>Can I put a private API key inside JavaScript?</summary><p>No. Anything shipped to a browser should be considered visible to the user. Put privileged credentials on your server.</p></details>
+<details><summary>Should I poll the game every second?</summary><p>Not when a supported WebSocket event stream is available. Prefer server-pushed events for continuously changing state.</p></details>
+<details><summary>Does the documentation page generate game results?</summary><p>No. It only demonstrates integration patterns and performs a lightweight public-site health check. It does not generate or predict crash outcomes.</p></details>
+<details><summary>Where do I find the exact production WebSocket URL?</summary><p>Use the endpoint configured and published by your backend. The current frontend repository does not expose a complete public endpoint contract, so this page intentionally uses a placeholder rather than inventing one.</p></details>
+<details><summary>How should I handle a disconnected client?</summary><p>Show a clear disconnected state, stop rendering stale data as current, reconnect with bounded backoff, and resynchronize state after reconnecting.</p></details>
+</section>
+</div></div>
+</main>
+<footer class="footer"><div class="container footer-row"><div>© 2026 <strong>Gaming API</strong> · Developer documentation</div><div class="footer-links"><a href="/">Home</a><a href="/login.html">Account</a><a href="/dashboard.html">Dashboard</a></div></div></footer>
+<script>
+const $=id=>document.getElementById(id);
+function tick(){const now=new Date();const t=now.toLocaleTimeString([], {hour12:false});$('clock').textContent=t;$('liveClock').textContent=t;}
+tick();setInterval(tick,1000);
+function addEvent(left,right){const row=document.createElement('div');row.className='event';row.innerHTML='<span></span><span></span>';row.children[0].textContent=left;row.children[1].textContent=right;$('eventLog').prepend(row);while($('eventLog').children.length>8)$('eventLog').lastElementChild.remove();}
+async function healthCheck(){const start=performance.now();$('heartbeat').textContent='Checking…';try{await fetch('/',{method:'HEAD',cache:'no-store',mode:'no-cors'});const ms=Math.round(performance.now()-start);$('siteDot').className='dot';$('siteStatus').textContent='Public site reachable';$('latency').textContent=ms+' ms';$('updated').textContent='Online';$('heartbeat').textContent='Healthy';$('lastCheck').textContent=new Date().toLocaleTimeString([], {hour12:false});addEvent('health-check',`site reachable · ${ms} ms`)}catch(e){$('siteDot').className='dot offline';$('siteStatus').textContent='Health check unavailable';$('latency').textContent='RETRYING';$('updated').textContent='Check failed';$('heartbeat').textContent='Unavailable';$('lastCheck').textContent=new Date().toLocaleTimeString([], {hour12:false});addEvent('health-check','request unavailable · retrying')} }
+healthCheck();setInterval(healthCheck,15000);setInterval(()=>addEvent('heartbeat',new Date().toLocaleTimeString([], {hour12:false})+' · documentation page active'),5000);
+document.querySelectorAll('.copy').forEach(btn=>btn.addEventListener('click',async()=>{const text=$(btn.dataset.copy).textContent;try{await navigator.clipboard.writeText(text);const old=btn.textContent;btn.textContent='Copied';setTimeout(()=>btn.textContent=old,1200)}catch(e){btn.textContent='Select & copy';setTimeout(()=>btn.textContent='Copy',1200)}}));
+</script>
+</body>
+</html>
