@@ -1,0 +1,17 @@
+{
+  "name": "Game API",
+  "short_name": "Game API",
+  "description": "Game API — real-time game infrastructure, secure authentication and developer tools.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050811",
+  "theme_color": "#050811",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
