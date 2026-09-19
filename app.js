@@ -66,7 +66,7 @@
       ${nav}
       <div class="app-bottom">
         <div class="app-user"><b id="email">Authenticated</b><span>Developer account</span></div>
-        <a class="app-upgrade" href="pricing.html">✦ Upgrade Plan</a>
+        <a class="app-upgrade" id="appPlanAction" href="pricing.html">✦ Upgrade Plan</a>
         <button class="app-out" id="signout">Sign out</button>
       </div>
     </aside>
@@ -84,8 +84,35 @@
   if (signout) signout.onclick = async () => { try { const sb = window.supabase; if (sb?.auth) await sb.auth.signOut(); } catch {} location.href = "login.html"; };
   shade.onclick = () => { side.classList.remove("open"); shade.classList.remove("show"); };
 
+  async function loadCurrentPlan() {
+    try {
+      const mod = await import("https://esm.sh/@supabase/supabase-js@2.105.0");
+      const sb = mod.createClient("https://qbagxeqquskkjksoraiz.supabase.co", "sb_publishable_chfRxHSFPSA1SZJtBajtKA_I7vs8R--");
+      const { data } = await sb.auth.getSession();
+      if (!data.session) return;
+      const response = await fetch("https://api.game-api.online/api/payments/subscription", {
+        headers: { Authorization: "Bearer " + data.session.access_token },
+        cache: "no-store"
+      });
+      if (!response.ok) return;
+      const result = await response.json();
+      const plan = String(result.plan || "free").toLowerCase();
+      const label = plan.charAt(0).toUpperCase() + plan.slice(1);
+      const action = document.getElementById("appPlanAction");
+      if (action) {
+        action.textContent = plan === "free" ? "✦ Upgrade Plan" : "✓ Current Plan: " + label;
+        action.setAttribute("aria-label", plan === "free" ? "Upgrade Plan" : "Current plan: " + label);
+      }
+      const accountPlan = document.querySelector("[data-current-plan]");
+      if (accountPlan) accountPlan.textContent = label;
+      window.GameApiApp.currentPlan = plan;
+    } catch {}
+  }
+  loadCurrentPlan();
+
   window.GameApiApp = {
     toggleSidebar: toggle,
-    closeSidebar: () => { side.classList.remove("open"); shade.classList.remove("show"); }
+    closeSidebar: () => { side.classList.remove("open"); shade.classList.remove("show"); },
+    currentPlan: "free"
   };
 })();
