@@ -1,5 +1,6 @@
-(() => {
-  if (window.__GAME_API_APP_LOADED__) return;
+window.GameApiAppReady = (async () => {
+  if (window.__GAME_API_APP_LOADED__) return window.GameApiApp;
+
   window.__GAME_API_APP_LOADED__ = true;
   const NAV = [
     { title: "MARKETS", items: [
@@ -37,7 +38,7 @@
     window.supabase = authClient;
     return authClient;
   }
-  const publicPages = new Set(["", "index.html", "login.html", "signup.html", "forgot-password.html", "reset-password.html", "about.html", "status.html", "contact.html", "live.html", "documentation.html", "api-reference.html", "test.html", "pricing.html"]);
+  const publicPages = new Set(["", "index.html", "login.html", "signup.html", "forgot-password.html", "reset-password.html", "about.html", "status.html", "contact.html", "live.html", "documentation.html", "api-reference.html", "test.html", "pricing.html", "guide.html", "policy.html", "agreement.html", "usage-details.html"]);
   const pageName = location.pathname.split("/").pop() || "index.html";
   const isPublicPage = publicPages.has(pageName);
   const isGuidePage = pageName === "guide.html";
