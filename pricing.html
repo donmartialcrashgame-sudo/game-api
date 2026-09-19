@@ -51,10 +51,7 @@
     if(!window.google || !google.payments || !google.payments.api){
       setStatus("Google Pay could not load. Check that the page is served over HTTPS.","error");return;
     }
-    paymentsClient=new google.payments.api.PaymentsClient({
-      environment:"TEST",
-      paymentDataCallbacks:{onPaymentAuthorized:onPaymentAuthorized}
-    });
+    paymentsClient=new google.payments.api.PaymentsClient({environment:"TEST"});
     paymentsClient.isReadyToPay({
       apiVersion:2,apiVersionMinor:0,
       allowedPaymentMethods:[{type:"CARD",parameters:{allowedAuthMethods:["PAN_ONLY","CRYPTOGRAM_3DS"],allowedCardNetworks:["AMEX","DISCOVER","INTERAC","JCB","MASTERCARD","VISA"]}}]
@@ -65,7 +62,7 @@
           setStatus("Opening Google Pay TEST checkout…");
           paymentsClient.loadPaymentData(getPaymentDataRequest()).catch(function(error){
             if(error && error.statusCode==="CANCELED"){setStatus("Google Pay test checkout was cancelled.");return;}
-            console.error("Google Pay TEST loadPaymentData error:",error);const code=error&&error.statusCode?(" ["+error.statusCode+"]"):"";const message=error&&error.statusMessage?(" "+error.statusMessage):"";setStatus("Google Pay TEST checkout failed."+code+message,"error");
+            console.error("Google Pay TEST loadPaymentData error:",error);const code=error&&error.statusCode?(" ["+error.statusCode+"]"):"";const message=error&&error.statusMessage?(" "+error.statusMessage):"";setStatus("Google Pay TEST checkout failed."+code+message+" Open Console (F12) for details.","error");
           });
         },
         buttonType:"buy",
