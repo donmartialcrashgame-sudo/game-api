@@ -1,4 +1,6 @@
 (() => {
+  if (window.__GAME_API_APP_LOADED__) return;
+  window.__GAME_API_APP_LOADED__ = true;
   const NAV = [
     { title: "MARKETS", items: [
       ["▦", "Dashboard", "dashboard.html"],
@@ -46,7 +48,7 @@
   document.head.appendChild(manifestLink);
 
   const css = `
-.has-app-sidebar{padding-left:269px}.has-app-sidebar .app-sidebar{left:0}.app-sidebar{background:var(--app-sidebar-bg,#07101b)}.app-sidebar.app-collapsed{width:72px}.app-sidebar.app-collapsed .app-brand span:last-child,.app-sidebar.app-collapsed .app-title,.app-sidebar.app-collapsed .app-nav a{font-size:0}.app-sidebar.app-collapsed .app-brand{justify-content:center}.app-sidebar.app-collapsed .app-nav a{display:grid;place-items:center}.app-sidebar.app-collapsed .app-user,.app-sidebar.app-collapsed .app-upgrade{display:none}.app-sidebar.app-collapsed .app-out{font-size:0}.app-sidebar.app-collapsed .app-out:after{content:'↪';font-size:14px}.app-sidebar.app-top{width:100%;height:66px;inset:0 0 auto 0;flex-direction:row;align-items:center;border-right:0;border-bottom:1px solid #ffffff10;padding:8px 14px}.app-top-body{padding-top:66px}.app-top .app-brand{padding:0 10px}.app-top .app-group{padding:0;display:flex;align-items:center}.app-top .app-title,.app-top .app-user,.app-top .app-out{display:none}.app-top .app-nav{display:flex}.app-top .app-bottom{margin-left:auto}.app-top .app-upgrade{margin:0;width:auto}@media(max-width:900px){.has-app-sidebar{padding-left:0}}
+.has-app-sidebar{padding-left:269px!important}.has-app-sidebar .app-sidebar{left:0}.has-app-sidebar .side,.has-app-sidebar .sidebar{display:none!important}.has-app-sidebar .main{margin-left:0!important;width:100%!important}.app-sidebar{background:var(--app-sidebar-bg,#07101b)}.app-sidebar.app-collapsed{width:72px}.app-sidebar.app-collapsed .app-brand span:last-child,.app-sidebar.app-collapsed .app-title,.app-sidebar.app-collapsed .app-nav a{font-size:0}.app-sidebar.app-collapsed .app-brand{justify-content:center}.app-sidebar.app-collapsed .app-nav a{display:grid;place-items:center}.app-sidebar.app-collapsed .app-user,.app-sidebar.app-collapsed .app-upgrade{display:none}.app-sidebar.app-collapsed .app-out{font-size:0}.app-sidebar.app-collapsed .app-out:after{content:'↪';font-size:14px}.app-sidebar.app-top{width:100%;height:66px;inset:0 0 auto 0;flex-direction:row;align-items:center;border-right:0;border-bottom:1px solid #ffffff10;padding:8px 14px}.app-top-body{padding-top:66px}.app-top .app-brand{padding:0 10px}.app-top .app-group{padding:0;display:flex;align-items:center}.app-top .app-title,.app-top .app-user,.app-top .app-out{display:none}.app-top .app-nav{display:flex}.app-top .app-bottom{margin-left:auto}.app-top .app-upgrade{margin:0;width:auto}@media(max-width:900px){.has-app-sidebar{padding-left:0}}
 .app-sidebar{width:245px;position:fixed;inset:0 auto 0 0;background:#07101b;border-right:1px solid #ffffff10;padding:15px 12px;display:flex;flex-direction:column;z-index:100}
 .app-brand{display:flex;align-items:center;gap:10px;padding:7px 9px 22px;font-weight:900;color:#f3f7fb;text-decoration:none}
 .app-logo{width:37px;height:37px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8cff,#7047e8);box-shadow:0 8px 28px #5b8cff24}
@@ -71,7 +73,7 @@
 
   let host = document.getElementById("appSidebar");
   if (!host) { host = document.createElement("div"); host.id = "appSidebar"; document.body.prepend(host); }
-  if (!document.querySelector(".shell") && !document.querySelector(".layout")) document.body.classList.add("has-app-sidebar");
+  document.body.classList.add("has-app-sidebar");
 
   const current = location.pathname.split("/").pop() || "dashboard.html";
   const nav = NAV.map(group => `
