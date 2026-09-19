@@ -24,8 +24,8 @@
 </header>
 <section class="content">
   <div class="intro">
-    <div><h2>API Keys</h2><div class="muted">Create credentials for your applications. Secret keys are generated securely by the backend and are shown only once.</div></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="primary" style="text-decoration:none;display:inline-flex;align-items:center" href="test.html">◉ Test API</a><button class="secondary icon-copy" id="copySaved" title="Copy saved API secret" aria-label="Copy saved API secret">⧉</button><button class="primary" id="create">+ Create new key</button></div>
+    <div><h2>API Keys</h2><div class="muted">Create credentials for your applications. Secret keys are generated securely and can be copied again from any signed-in device.</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="primary" style="text-decoration:none;display:inline-flex;align-items:center" href="test.html">◉ Test API</a><button class="secondary icon-copy" id="copySaved" title="Copy API secret" aria-label="Copy saved API secret">⧉</button><button class="primary" id="create">+ Create new key</button></div>
   </div>
   <div class="planbar"><div class="planbox"><small>Current plan</small><strong id="planName">Free</strong></div><div class="planbox"><small>Monthly requests</small><strong id="planUsage">—</strong><div class="progress"><i id="planProgress" style="width:0%"></i></div></div><div class="planbox"><small>Requests remaining</small><strong id="planRemaining">—</strong></div></div>
   <div class="panel">
@@ -45,7 +45,7 @@
 </div></div>
 
 <div class="modal" id="secretModal"><div class="dialog">
-  <h3>API key created</h3><div class="muted">Copy this key now. For security, the backend does not store the original secret and it will not be shown again.</div>
+  <h3>API key created</h3><div class="muted">Your secret is encrypted on the backend and can be recovered from your account on any signed-in device.</div>
   <div class="secret" id="secret"></div>
   <div class="warning">Keep this secret private. Do not commit it to GitHub or place it in browser code.</div>
   <div class="modal-actions"><button class="secondary" id="copy">Copy key</button><button class="primary" id="done">I've copied it</button></div>
@@ -92,7 +92,7 @@ async function backend(action, extra = {}) {
   const routes = {
     list: { method: "GET", path: "/api/keys" },
     create: { method: "POST", path: "/api/keys" },
-    revoke: { method: "POST", path: extra.id ? `/api/keys/${encodeURIComponent(extra.id)}/revoke` : "" }
+    revoke: { method: "POST", path: extra.id ? `/api/keys/${encodeURIComponent(extra.id)}/revoke` : "" },\n    secret: { method: "GET", path: extra.id ? `/api/keys/${encodeURIComponent(extra.id)}/secret` : "" }
   };
   const route = routes[action];
   if (!route?.path) throw new Error("Invalid API key action");
@@ -166,7 +166,7 @@ $("copy").onclick = async () => {
   catch { showError("Clipboard access failed. Copy the key manually."); }
 };
 $("done").onclick = () => $("secretModal").classList.remove("show");
-$("copySaved").onclick = async () => { const saved = localStorage.getItem("game_api_last_secret"); if (!saved) { alert("No saved API secret is available on this device."); return; } try { await navigator.clipboard.writeText(saved); $("copySaved").textContent = "✓"; setTimeout(() => $("copySaved").textContent = "⧉", 1400); } catch { alert("Clipboard access failed."); } };
+$("copySaved").onclick = async () => { const active = keys.find(k => k.status === "active"); if (!active) { alert("No active API key is available."); return; } try { const result = await backend("secret", { id: active.id }); await navigator.clipboard.writeText(result.secret); $("copySaved").textContent = "✓"; setTimeout(() => $("copySaved").textContent = "⧉", 1400); } catch { alert("Clipboard access failed."); } };
 $("signout").onclick = async () => { await supabase.auth.signOut(); location.href = "login.html"; };
 
 async function init() {
