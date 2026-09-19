@@ -72,7 +72,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.105.0";
 
 const SUPABASE_URL = "https://qbagxeqquskkjksoraiz.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFiYWd4ZXFxdXNra2prc29yYWl6IiwiaWF0IjoxNzg3MzIzODk4LCJleHAiOjIxMDI4OTk4OTh9.CpvwORFZrDtM5TVzqUlkHyc39E4jofCebQ16Ne-wShk";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiI1NiI6IkpXVCJ9";
+const BACKEND_URL = "https://game-api-websocket.onrender.com";
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const $ = id => document.getElementById(id);
@@ -81,13 +82,28 @@ let keys = [];
 
 function showError(text) { $("error").textContent = text; $("error").hidden = false; }
 function clearError() { $("error").hidden = true; $("error").textContent = ""; }
-function esc(value) { return String(value ?? "").replace(/[&<>\"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;","'":"&#39;"}[c])); }
-function preview(key) { return `${key.key_prefix}••••••••${key.key_last4}`; }
+function esc(value) { return String(value ?? "").replace(/[&<>\"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;"}[c])); }
+function preview(key) { return `${key.key_prefix}_••••••••${key.key_last4}`; }
 
 async function backend(action, extra = {}) {
-  const { data, error } = await supabase.functions.invoke("api-keys", { body: { action, ...extra } });
-  if (error) throw new Error(error.message || "API key service failed");
-  if (data?.error) throw new Error(data.error);
+  const routes = {
+    list: { method: "GET", path: "/api/keys" },
+    create: { method: "POST", path: "/api/keys" },
+    revoke: { method: "POST", path: extra.id ? `/api/keys/${encodeURIComponent(extra.id)}/revoke` : "" }
+  };
+  const route = routes[action];
+  if (!route?.path) throw new Error("Invalid API key action");
+
+  const headers = { "Content-Type": "application/json" };
+  if (session?.access_token) headers.Authorization = `Bearer ${session.access_token}`;
+
+  const response = await fetch(BACKEND_URL + route.path, {
+    method: route.method,
+    headers,
+    body: route.method === "POST" && action === "create" ? JSON.stringify({ name: extra.name }) : undefined
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || `Backend returned HTTP ${response.status}`);
   return data;
 }
 
@@ -101,13 +117,7 @@ function render() {
   }
   $("tableWrap").className = "panel";
   $("tableWrap").innerHTML = `<table class="table"><thead><tr><th>Name</th><th>Key</th><th>Created</th><th>Status</th><th>Action</th></tr></thead><tbody>${list.map(k => `
-    <tr>
-      <td><strong>${esc(k.name)}</strong></td>
-      <td class="key">${esc(preview(k))}</td>
-      <td>${new Date(k.created_at).toLocaleDateString()}</td>
-      <td><span class="badge ${k.status === "revoked" ? "revoked" : ""}">${String(k.status).toUpperCase()}</span></td>
-      <td class="actions">${k.status === "active" ? `<button class="danger" data-revoke="${esc(k.id)}">Revoke</button>` : "—"}</td>
-    </tr>`).join("")}</tbody></table>`;
+    <tr><td><strong>${esc(k.name)}</strong></td><td class="key">${esc(preview(k))}</td><td>${new Date(k.created_at).toLocaleDateString()}</td><td><span class="badge ${k.status === "revoked" ? "revoked" : ""}">${String(k.status).toUpperCase()}</span></td><td class="actions">${k.status === "active" ? `<button class="danger" data-revoke="${esc(k.id)}">Revoke</button>` : "—"}</td></tr>`).join("")}</tbody></table>`;
 
   document.querySelectorAll("[data-revoke]").forEach(button => {
     button.addEventListener("click", async () => {
@@ -131,9 +141,7 @@ $("search").oninput = render;
 
 $("generate").onclick = async () => {
   const name = $("name").value.trim() || "Untitled key";
-  $("generate").disabled = true;
-  $("generate").textContent = "Generating…";
-  clearError();
+  $("generate").disabled = true; $("generate").textContent = "Generating…"; clearError();
   try {
     const result = await backend("create", { name });
     $("modal").classList.remove("show");
