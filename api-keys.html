@@ -16,28 +16,10 @@
 </head>
 <body>
 <div class="layout">
-<aside class="side" id="side">
-  <div class="brand"><div class="logo">G</div><div>Gaming API<small>DEVELOPER CONSOLE</small></div></div>
-  <div class="nav-title">Workspace</div>
-  <nav class="nav">
-    <a href="dashboard.html">▦ &nbsp; Dashboard</a>
-    <a class="active" href="api-keys.html">⌘ &nbsp; API Keys</a>
-    <a href="dashboard.html">▣ &nbsp; Projects</a>
-    <a href="dashboard.html">◌ &nbsp; Usage & Analytics</a>
-  </nav>
-  <div class="nav-title">Account</div>
-  <nav class="nav">
-    <a href="mfa-setup.html">⌾ &nbsp; Security</a>
-    <a href="dashboard.html">◉ &nbsp; Authentication</a>
-    <a href="dashboard.html">⚙ &nbsp; Settings</a>
-    <a href="dashboard.html">▤ &nbsp; Documentation</a>
-  </nav>
-  <div class="bottom"><button class="signout" id="signout">Sign out</button></div>
-</aside>
-
+<div id="appSidebar"></div>
 <main class="main">
 <header>
-  <div><button class="hamb" id="hamb">☰</button><h1>API Keys</h1><p>Create and manage credentials for your applications</p></div>
+  <div><h1>API Keys</h1><p>Create and manage credentials for your applications</p></div>
   <div class="email" id="email">Checking session…</div>
 </header>
 <section class="content">
@@ -69,6 +51,7 @@
   <div class="modal-actions"><button class="secondary" id="copy">Copy key</button><button class="primary" id="done">I've copied it</button></div>
 </div></div>
 
+<script src="app.js"></script>
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.105.0";
 
@@ -160,7 +143,6 @@ $("copy").onclick = async () => {
 };
 $("done").onclick = () => $("secretModal").classList.remove("show");
 $("copySaved").onclick = async () => { const saved = localStorage.getItem("game_api_last_secret"); if (!saved) { alert("No previously generated key is saved on this device."); return; } try { await navigator.clipboard.writeText(saved); $("copySaved").textContent = "Copied"; setTimeout(() => $("copySaved").textContent = "Copy last key", 1400); } catch { alert("Clipboard access failed."); } };
-$("hamb").onclick = () => $("side").classList.toggle("open");
 $("signout").onclick = async () => { await supabase.auth.signOut(); location.href = "login.html"; };
 
 async function init() {
