@@ -13,6 +13,9 @@
       ["●", "Status", "status.html"],
       ["◇", "Plans", "pricing.html"],
       ["⌾", "Security", "mfa-setup.html"]
+    ]},
+    { title: "ACCOUNT", items: [
+      ["⚙", "Settings", "settings.html"]
     ]}
   ];
 
@@ -26,6 +29,7 @@
 .app-nav a:hover,.app-nav a.active{background:#5b8cff12;color:#fff;box-shadow:inset 2px 0 #5b8cff}
 .app-bottom{margin-top:auto}.app-user{padding:10px;border:1px solid #ffffff10;border-radius:9px;background:#ffffff03;font-size:9px;color:#f3f7fb}
 .app-user b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.app-user span{color:#58677d}
+.app-upgrade{display:flex;align-items:center;justify-content:center;width:100%;margin-top:9px;padding:10px;border-radius:8px;background:linear-gradient(135deg,#5b8cff,#7047e8);color:#fff;text-decoration:none;font-size:10px;font-weight:900;box-shadow:0 8px 22px #5b8cff20}.app-upgrade:hover{filter:brightness(1.08);transform:translateY(-1px)}
 .app-out{width:100%;margin-top:7px;background:#ffffff04;border:1px solid #ffffff10;color:#9eabbc;border-radius:8px;padding:9px;cursor:pointer;font-weight:800;font-size:10px}
 .app-menu{display:none;position:fixed;left:12px;top:12px;z-index:110;border:1px solid #ffffff18;background:#0b1523;color:#fff;border-radius:8px;padding:9px 11px;cursor:pointer}
 .app-shade{display:none;position:fixed;inset:0;background:#0009;z-index:90}
@@ -56,6 +60,7 @@
       ${nav}
       <div class="app-bottom">
         <div class="app-user"><b id="email">Authenticated</b><span>Developer account</span></div>
+        <a class="app-upgrade" href="pricing.html">✦ Upgrade Plan</a>
         <button class="app-out" id="signout">Sign out</button>
       </div>
     </aside>
