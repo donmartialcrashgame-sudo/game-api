@@ -37,7 +37,7 @@
     window.supabase = authClient;
     return authClient;
   }
-  const publicPages = new Set(["", "index.html", "login.html", "signup.html", "forgot-password.html", "reset-password.html"]);
+  const publicPages = new Set(["", "index.html", "login.html", "signup.html", "forgot-password.html", "reset-password.html", "about.html", "status.html", "contact.html", "live.html", "documentation.html", "api-reference.html", "test.html", "pricing.html"]);
   const pageName = location.pathname.split("/").pop() || "index.html";
   const isPublicPage = publicPages.has(pageName);
   const isGuidePage = pageName === "guide.html";
@@ -87,7 +87,7 @@
 
   host.innerHTML = `
     <aside class="app-sidebar" id="appSide">
-      <a class="app-brand" href="dashboard.html"><span class="app-logo">G</span><span>Gaming API<small>DEVELOPER CONSOLE</small></span></a>
+      <a class="app-brand" href="dashboard.html"><span class="app-logo">G</span><span>Game API<small>DEVELOPER CONSOLE</small></span></a>
       ${nav}
       <div class="app-bottom">
         <div class="app-user"><b id="email">Authenticated</b><span>Developer account</span></div>
@@ -140,8 +140,6 @@
       window.GameApiApp.currentPlan = plan;
     } catch {}
   }
-  loadCurrentPlan();
-
   async function ensureRealAuthentication() {
     try {
       const sb = await getAuthClient();
