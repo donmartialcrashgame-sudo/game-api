@@ -12,235 +12,370 @@
 <div class="card" data-plan-card="premium"><h3>Premium</h3><div class="price">₦50,000</div><p>For high-volume and commercial integrations.</p><ul class="features"><li>1,000,000 API requests</li><li>Priority support</li><li>Custom integration discussion</li><li>Commercial options</li><li>Production access</li></ul><div class="gpay-wrap"><span class="gpay-label">Pay with Google Pay · TEST MODE</span><div id="google-pay-button-premium" class="gpay-button"></div><div id="gpay-status-premium" class="demo-status">No real charge will be made in demo mode.</div></div></div></div><div class="compare">Need a custom limit, commercial arrangement or integration support? <a href="contact.html" style="color:#9dbbff">Contact the team →</a></div></section></main><div class="upgrade-modal" id="upgradeModal"><div class="upgrade-dialog"><div class="upgrade-head"><div><h2>Upgrade your plan</h2><p>Choose a higher plan.</p></div><button class="upgrade-close" id="upgradeClose" type="button">Close</button></div><div class="upgrade-options" id="upgradeOptions"></div></div></div><footer>© 2026 Gaming API · <a href="documentation.html">Documentation</a> · <a href="status.html">Status</a> · <a href="settings.html">Settings</a></footer>
 <script type="module">
 import{createClient}from"https://esm.sh/@supabase/supabase-js@2.105.0";
-const supabase=createClient("https://qbagxeqquskkjksoraiz.supabase.co","sb_publishable_chfRxHSFPSA1SZJtBajtKA_I7vs8R--");
+
+const supabase=createClient(
+  "https://qbagxeqquskkjksoraiz.supabase.co",
+  "sb_publishable_chfRxHSFPSA1SZJtBajtKA_I7vs8R--"
+);
+
+const planRank={free:0,starter:1,standard:2,premium:3};
+let currentPlan="free";
+
 async function activateDemoPlan(plan,amount,statusEl,label,statusSetter){
   const {data,error}=await supabase.auth.getSession();
-  if(error||!data.session){ statusSetter(statusEl,"Please sign in before upgrading.","error"); setTimeout(()=>location.href="login.html?next=pricing.html",700); return; }
-  const response=await fetch("https://api.game-api.online/api/payments/demo/activate",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+data.session.access_token},body:JSON.stringify({plan,amount,paymentId:"gpay-test-"+Date.now()})});
+  if(error||!data.session){
+    statusSetter(statusEl,"Please sign in before upgrading.","error");
+    setTimeout(()=>location.href="login.html?next=pricing.html",700);
+    return;
+  }
+
+  const response=await fetch("https://api.game-api.online/api/payments/demo/activate",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      Authorization:"Bearer "+data.session.access_token
+    },
+    body:JSON.stringify({
+      plan,
+      amount,
+      paymentId:"gpay-test-"+Date.now()
+    })
+  });
+
   const result=await response.json();
   if(!response.ok) throw new Error(result.error||"Could not activate plan");
-  statusSetter(statusEl,"✓ "+label+" activated. Your existing API keys now use the new plan.","success");
+
+  statusSetter(
+    statusEl,
+    "✓ "+label+" activated. Your existing API keys now use the new plan.",
+    "success"
+  );
+
   setTimeout(()=>location.href="dashboard.html",900);
 }
-(function(){
-  let paymentsClient;
-  const plans={
-    starter:{key:"starter",price:"4000.00",button:"google-pay-button-starter",status:"gpay-status-starter",label:"Starter"},
-    standard:{key:"standard",price:"25000.00",button:"google-pay-button-standard",status:"gpay-status-standard",label:"Standard"},
-    premium:{key:"premium",price:"50000.00",button:"google-pay-button-premium",status:"gpay-status-premium",label:"Premium"}
-  };
-  function setStatus(el,message,type){
-    el.textContent=message;
-    el.className="demo-status"+(type?" "+type:"");
+
+function setStatus(el,message,type){
+  if(!el) return;
+  el.textContent=message;
+  el.className="demo-status"+(type?" "+type:"");
+}
+
+function applyCurrentPlan(){
+  const grid=document.getElementById("plansGrid");
+  const modal=document.getElementById("upgradeModal");
+  const options=document.getElementById("upgradeOptions");
+
+  if(!grid||!modal||!options) return;
+
+  const cards=[...grid.querySelectorAll("[data-plan-card]")];
+  const currentRank=planRank[currentPlan]||0;
+  const currentCard=cards.find(card=>card.dataset.planCard===currentPlan);
+
+  cards.forEach(card=>{
+    card.style.display="";
+    card.removeAttribute("data-current");
+  });
+
+  options.innerHTML="";
+
+  if(currentPlan==="free"){
+    grid.style.gridTemplateColumns="";
+    return;
   }
-  function getPaymentDataRequest(plan){
-    return {
-      apiVersion:2,
-      apiVersionMinor:0,
-      allowedPaymentMethods:[{
-        type:"CARD",
-        parameters:{
-          allowedAuthMethods:["PAN_ONLY","CRYPTOGRAM_3DS"],
-          allowedCardNetworks:["MASTERCARD","VISA"]
-        },
-        tokenizationSpecification:{
-          type:"PAYMENT_GATEWAY",
-          parameters:{gateway:"example",gatewayMerchantId:"exampleGatewayMerchantId"}
-        }
-      }],
-      merchantInfo:{merchantName:"Game API",merchantId:"12345678901234567890"},
-      transactionInfo:{
-        totalPriceStatus:"FINAL",
-        totalPrice:plan.price,
-        currencyCode:"NGN",
-        countryCode:"NG"
-      }
-    };
+
+  if(!currentCard) return;
+
+  currentCard.setAttribute("data-current","true");
+
+  const oldBadge=currentCard.querySelector(".current-plan-badge");
+  if(oldBadge) oldBadge.remove();
+
+  const badge=document.createElement("div");
+  badge.className="current-plan-badge";
+  badge.textContent="✓ CURRENT PLAN";
+  currentCard.insertBefore(badge,currentCard.firstChild);
+
+  const action=currentCard.querySelector(".gpay-wrap, .card > .btn");
+  if(action) action.remove();
+
+  cards.forEach(card=>{
+    const plan=card.dataset.planCard;
+    const rank=planRank[plan]||0;
+
+    if(plan!==currentPlan && rank<=currentRank){
+      card.style.display="none";
+    }
+  });
+
+  grid.style.gridTemplateColumns="1fr";
+
+  const area=document.createElement("div");
+  area.className="upgrade-area";
+
+  const currentLabel=currentPlan.charAt(0).toUpperCase()+currentPlan.slice(1);
+  area.innerHTML=
+    "<p>You are currently subscribed to <strong>"+
+    currentLabel+
+    "</strong>.</p>"+
+    '<button class="btn primary" id="openUpgrade" type="button">↑ Upgrade Plan</button>';
+
+  currentCard.appendChild(area);
+
+  const higher=cards.filter(card=>
+    (planRank[card.dataset.planCard]||0)>currentRank
+  );
+
+  higher.forEach(card=>{
+    options.appendChild(card);
+    card.style.display="block";
+  });
+
+  const open=document.getElementById("openUpgrade");
+
+  if(higher.length){
+    open.addEventListener("click",()=>modal.classList.add("open"));
+  }else{
+    open.textContent="No higher plan available";
+    open.disabled=true;
   }
-  function onGooglePayLoaded(){
-    if(!window.google || !google.payments || !google.payments.api){
-      Object.values(plans).forEach(function(plan){
-        setStatus(document.getElementById(plan.status),"Google Pay could not load. Check that the page is served over HTTPS.","error");
-      });
+
+  const close=document.getElementById("upgradeClose");
+  if(close) close.addEventListener("click",()=>modal.classList.remove("open"));
+
+  modal.addEventListener("click",event=>{
+    if(event.target===modal) modal.classList.remove("open");
+  });
+}
+
+async function loadCurrentPlan(){
+  try{
+    const {data,error}=await supabase.auth.getSession();
+
+    if(error||!data.session){
+      currentPlan="free";
+      applyCurrentPlan();
       return;
     }
-    paymentsClient=new google.payments.api.PaymentsClient({environment:"TEST"});
-    paymentsClient.isReadyToPay({
-      apiVersion:2,apiVersionMinor:0,
-      allowedPaymentMethods:[{
-        type:"CARD",
-        parameters:{allowedAuthMethods:["PAN_ONLY","CRYPTOGRAM_3DS"],allowedCardNetworks:["MASTERCARD","VISA"]}
-      }]
-    }).then(function(result){
-      if(!result.result){
-        Object.values(plans).forEach(function(plan){
-          setStatus(document.getElementById(plan.status),"Google Pay is not available in this browser/account.","error");
-        });
-        return;
-      }
-      Object.values(plans).forEach(function(plan){
-        const statusEl=document.getElementById(plan.status);
-        const container=document.getElementById(plan.button);
-        const button=paymentsClient.createButton({
-          onClick:function(){
-            setStatus(statusEl,"Opening Google Pay TEST checkout…");
-            paymentsClient.loadPaymentData(getPaymentDataRequest(plan)).then(function(paymentData){
-              console.log("Google Pay TEST payment data:",paymentData);
-              setStatus(statusEl,plan.label+" Google Pay TEST payment response received. No real charge was made.","success");
-              activateDemoPlan(plan.key,Number(plan.price),statusEl,plan.label,setStatus).catch(function(error){console.error("DEMO PLAN ACTIVATION ERROR:",error);setStatus(statusEl,"Payment test succeeded, but plan activation failed. Please try again.","error");});
-            }).catch(function(error){
-              if(error && error.statusCode==="CANCELED"){
-                setStatus(statusEl,"Google Pay test checkout was cancelled.");
-                return;
-              }
-              console.error("Google Pay TEST loadPaymentData error:",error);
-              const code=error&&error.statusCode?(" ["+error.statusCode+"]"):"";
-              const message=error&&error.statusMessage?(" "+error.statusMessage):"";
-              setStatus(statusEl,"Google Pay TEST checkout failed."+code+message+" Open Console (F12) for details.","error");
-            });
-          },
-          buttonType:"buy",
-          buttonColor:"black"
-        });
-        container.appendChild(button);
-      });
-    }).catch(function(error){
-      console.error(error);
-      Object.values(plans).forEach(function(plan){
-        setStatus(document.getElementById(plan.status),"Could not initialize Google Pay TEST mode.","error");
-      });
-    });
-  }
-  const gpayScript=document.getElementById("google-pay-script");
-  if(window.google && google.payments && google.payments.api){
-    onGooglePayLoaded();
-  }else if(gpayScript){
-    gpayScript.addEventListener("load",onGooglePayLoaded,{once:true});
-    gpayScript.addEventListener("error",function(){
-      Object.values(plans).forEach(function(plan){
-        setStatus(document.getElementById(plan.status),"Google Pay library failed to load. Please refresh and try again.","error");
-      });
-    },{once:true});
-  }
-})();
-</script></body></html  function applyCurrentPlan(){
-    const grid=document.getElementById("plansGrid"), modal=document.getElementById("upgradeModal"), options=document.getElementById("upgradeOptions");
-    const currentRank=planRank[currentPlan]||0;
-    const cards=[...document.querySelectorAll("[data-plan-card]")];
-    const currentCard=cards.find(function(c){return c.getAttribute("data-plan-card")===currentPlan;});
-    cards.forEach(function(card){
-      const plan=card.getAttribute("data-plan-card"), rank=planRank[plan]||0;
-      if(plan===currentPlan){
-        card.setAttribute("data-current","true");
-        const badge=document.createElement("div"); badge.className="current-plan-badge"; badge.textContent="✓ CURRENT PLAN"; card.insertBefore(badge,card.firstChild);
-        const action=card.querySelector(".gpay-wrap, .card > .btn"); if(action) action.remove();
-      }else if(currentPlan!=="free" && rank<=currentRank){ card.style.display="none"; }
-    });
-    if(currentPlan!=="free" && currentCard){
-      grid.style.gridTemplateColumns="1fr";
-      const area=document.createElement("div"); area.className="upgrade-area";
-      area.innerHTML="<p>You are currently subscribed to <strong>"+currentPlan.charAt(0).toUpperCase()+currentPlan.slice(1)+"</strong>.</p><button class=\"btn primary\" id=\"openUpgrade\" type=\"button\">↑ Upgrade Plan</button>";
-      currentCard.appendChild(area);
-      const higher=cards.filter(function(c){return (planRank[c.getAttribute("data-plan-card")]||0)>currentRank;});
-      higher.forEach(function(c){options.appendChild(c);c.style.display="block";});
-      const open=document.getElementById("openUpgrade");
-      if(higher.length){open.onclick=function(){modal.classList.add("open");};}else{open.textContent="No higher plan available";open.disabled=true;}
-      document.getElementById("upgradeClose").onclick=function(){modal.classList.remove("open");};
-      modal.onclick=function(e){if(e.target===modal)modal.classList.remove("open");};
-    }
-  };
-  function setStatus(el,message,type){
-    el.textContent=message;
-    el.className="demo-status"+(type?" "+type:"");
-  }
-  function getPaymentDataRequest(plan){
-    return {
-      apiVersion:2,
-      apiVersionMinor:0,
-      allowedPaymentMethods:[{
-        type:"CARD",
-        parameters:{
-          allowedAuthMethods:["PAN_ONLY","CRYPTOGRAM_3DS"],
-          allowedCardNetworks:["MASTERCARD","VISA"]
-        },
-        tokenizationSpecification:{
-          type:"PAYMENT_GATEWAY",
-          parameters:{gateway:"example",gatewayMerchantId:"exampleGatewayMerchantId"}
+
+    const response=await fetch(
+      "https://api.game-api.online/api/payments/subscription",
+      {
+        headers:{
+          Authorization:"Bearer "+data.session.access_token
         }
-      }],
-      merchantInfo:{merchantName:"Game API",merchantId:"12345678901234567890"},
-      transactionInfo:{
-        totalPriceStatus:"FINAL",
-        totalPrice:plan.price,
-        currencyCode:"NGN",
-        countryCode:"NG"
       }
-    };
-  }
-  function onGooglePayLoaded(){
-    if(!window.google || !google.payments || !google.payments.api){
-      Object.values(plans).forEach(function(plan){
-        setStatus(document.getElementById(plan.status),"Google Pay could not load. Check that the page is served over HTTPS.","error");
-      });
+    );
+
+    if(!response.ok){
+      currentPlan="free";
+      applyCurrentPlan();
       return;
     }
-    paymentsClient=new google.payments.api.PaymentsClient({environment:"TEST"});
-    paymentsClient.isReadyToPay({
-      apiVersion:2,apiVersionMinor:0,
-      allowedPaymentMethods:[{
-        type:"CARD",
-        parameters:{allowedAuthMethods:["PAN_ONLY","CRYPTOGRAM_3DS"],allowedCardNetworks:["MASTERCARD","VISA"]}
-      }]
-    }).then(function(result){
-      if(!result.result){
-        Object.values(plans).forEach(function(plan){
-          setStatus(document.getElementById(plan.status),"Google Pay is not available in this browser/account.","error");
-        });
-        return;
-      }
-      Object.values(plans).forEach(function(plan){
-        const statusEl=document.getElementById(plan.status);
-        const container=document.getElementById(plan.button);
-        const button=paymentsClient.createButton({
-          onClick:function(){
-            setStatus(statusEl,"Opening Google Pay TEST checkout…");
-            paymentsClient.loadPaymentData(getPaymentDataRequest(plan)).then(function(paymentData){
-              console.log("Google Pay TEST payment data:",paymentData);
-              setStatus(statusEl,plan.label+" Google Pay TEST payment response received. No real charge was made.","success");
-              activateDemoPlan(plan.key,Number(plan.price),statusEl,plan.label,setStatus).catch(function(error){console.error("DEMO PLAN ACTIVATION ERROR:",error);setStatus(statusEl,"Payment test succeeded, but plan activation failed. Please try again.","error");});
-            }).catch(function(error){
-              if(error && error.statusCode==="CANCELED"){
-                setStatus(statusEl,"Google Pay test checkout was cancelled.");
-                return;
-              }
-              console.error("Google Pay TEST loadPaymentData error:",error);
-              const code=error&&error.statusCode?(" ["+error.statusCode+"]"):"";
-              const message=error&&error.statusMessage?(" "+error.statusMessage):"";
-              setStatus(statusEl,"Google Pay TEST checkout failed."+code+message+" Open Console (F12) for details.","error");
-            });
-          },
-          buttonType:"buy",
-          buttonColor:"black"
-        });
-        container.appendChild(button);
-      });
-    }).catch(function(error){
-      console.error(error);
-      Object.values(plans).forEach(function(plan){
-        setStatus(document.getElementById(plan.status),"Could not initialize Google Pay TEST mode.","error");
-      });
-    });
+
+    const result=await response.json();
+    currentPlan=planRank[result.plan]!==undefined?result.plan:"free";
+  }catch(error){
+    console.error("CURRENT PLAN LOAD ERROR:",error);
+    currentPlan="free";
   }
+
+  applyCurrentPlan();
+}
+
+const plans={
+  starter:{
+    key:"starter",
+    price:"4000.00",
+    button:"google-pay-button-starter",
+    status:"gpay-status-starter",
+    label:"Starter"
+  },
+  standard:{
+    key:"standard",
+    price:"25000.00",
+    button:"google-pay-button-standard",
+    status:"gpay-status-standard",
+    label:"Standard"
+  },
+  premium:{
+    key:"premium",
+    price:"50000.00",
+    button:"google-pay-button-premium",
+    status:"gpay-status-premium",
+    label:"Premium"
+  }
+};
+
+let paymentsClient;
+
+function getPaymentDataRequest(plan){
+  return{
+    apiVersion:2,
+    apiVersionMinor:0,
+    allowedPaymentMethods:[{
+      type:"CARD",
+      parameters:{
+        allowedAuthMethods:["PAN_ONLY","CRYPTOGRAM_3DS"],
+        allowedCardNetworks:["MASTERCARD","VISA"]
+      },
+      tokenizationSpecification:{
+        type:"PAYMENT_GATEWAY",
+        parameters:{
+          gateway:"example",
+          gatewayMerchantId:"exampleGatewayMerchantId"
+        }
+      }
+    }],
+    merchantInfo:{
+      merchantName:"Game API",
+      merchantId:"12345678901234567890"
+    },
+    transactionInfo:{
+      totalPriceStatus:"FINAL",
+      totalPrice:plan.price,
+      currencyCode:"NGN",
+      countryCode:"NG"
+    }
+  };
+}
+
+function showGooglePayError(message){
+  Object.values(plans).forEach(plan=>{
+    setStatus(
+      document.getElementById(plan.status),
+      message,
+      "error"
+    );
+  });
+}
+
+function onGooglePayLoaded(){
+  if(!window.google||!google.payments||!google.payments.api){
+    showGooglePayError(
+      "Google Pay could not load. Check that the page is served over HTTPS."
+    );
+    return;
+  }
+
+  paymentsClient=new google.payments.api.PaymentsClient({
+    environment:"TEST"
+  });
+
+  paymentsClient.isReadyToPay({
+    apiVersion:2,
+    apiVersionMinor:0,
+    allowedPaymentMethods:[{
+      type:"CARD",
+      parameters:{
+        allowedAuthMethods:["PAN_ONLY","CRYPTOGRAM_3DS"],
+        allowedCardNetworks:["MASTERCARD","VISA"]
+      }
+    }]
+  }).then(result=>{
+    if(!result.result){
+      showGooglePayError(
+        "Google Pay is not available in this browser/account."
+      );
+      return;
+    }
+
+    Object.values(plans).forEach(plan=>{
+      const statusEl=document.getElementById(plan.status);
+      const container=document.getElementById(plan.button);
+
+      if(!container||!statusEl) return;
+
+      const button=paymentsClient.createButton({
+        onClick:()=>{
+          setStatus(statusEl,"Opening Google Pay TEST checkout.");
+
+          paymentsClient.loadPaymentData(
+            getPaymentDataRequest(plan)
+          ).then(paymentData=>{
+            console.log("Google Pay TEST payment data:",paymentData);
+
+            setStatus(
+              statusEl,
+              plan.label+" Google Pay TEST payment response received. No real charge was made.",
+              "success"
+            );
+
+            return activateDemoPlan(
+              plan.key,
+              Number(plan.price),
+              statusEl,
+              plan.label,
+              setStatus
+            );
+          }).catch(error=>{
+            if(error&&error.statusCode==="CANCELED"){
+              setStatus(
+                statusEl,
+                "Google Pay test checkout was cancelled."
+              );
+              return;
+            }
+
+            console.error(
+              "Google Pay TEST loadPaymentData error:",
+              error
+            );
+
+            const code=error&&error.statusCode
+              ?" ["+error.statusCode+"]"
+              :"";
+
+            const message=error&&error.statusMessage
+              ?" "+error.statusMessage
+              :"";
+
+            setStatus(
+              statusEl,
+              "Google Pay TEST checkout failed."+code+message+
+              " Open Console (F12) for details.",
+              "error"
+            );
+          });
+        },
+        buttonType:"buy",
+        buttonColor:"black"
+      });
+
+      container.appendChild(button);
+    });
+  }).catch(error=>{
+    console.error("Google Pay TEST initialization error:",error);
+    showGooglePayError(
+      "Could not initialize Google Pay TEST mode."
+    );
+  });
+}
+
+async function init(){
+  await loadCurrentPlan();
+
   const gpayScript=document.getElementById("google-pay-script");
-  if(window.google && google.payments && google.payments.api){
+
+  if(window.google&&google.payments&&google.payments.api){
     onGooglePayLoaded();
   }else if(gpayScript){
-    gpayScript.addEventListener("load",onGooglePayLoaded,{once:true});
-    gpayScript.addEventListener("error",function(){
-      Object.values(plans).forEach(function(plan){
-        setStatus(document.getElementById(plan.status),"Google Pay library failed to load. Please refresh and try again.","error");
-      });
-    },{once:true});
+    gpayScript.addEventListener(
+      "load",
+      onGooglePayLoaded,
+      {once:true}
+    );
+
+    gpayScript.addEventListener(
+      "error",
+      ()=>{
+        showGooglePayError(
+          "Google Pay library failed to load. Please refresh and try again."
+        );
+      },
+      {once:true}
+    );
   }
-})();
+}
+
+init();
 </script></body></html>
