@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="/favicon.svg">
+<meta name="theme-color" content="#050811">
+<title>Game API — Getting Started</title>
+<style>
+:root{--bg:#050811;--panel:#09111e;--panel2:#0b1523;--line:#ffffff10;--text:#f3f7fb;--muted:#7f8da3;--blue:#5b8cff;--green:#25d39a;--yellow:#f6c453;--red:#ff6578}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:13px Inter,system-ui,Arial}.main{min-height:100vh;margin-left:245px}.top{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--line);background:#060b14e8;backdrop-filter:blur(16px);position:sticky;top:0;z-index:20}.top h1{font-size:14px;margin:0}.top p{font-size:9px;color:var(--muted);margin:3px 0}.content{padding:22px;max-width:1180px;margin:auto}.hero{padding:24px;border:1px solid #ffffff12;border-radius:14px;background:linear-gradient(145deg,#0c1727,#08101b);margin-bottom:12px}.eyebrow{font-size:9px;letter-spacing:1.2px;color:#7da5ff;font-weight:900}.hero h2{font-size:26px;margin:10px 0 8px}.hero p{color:#9aa8bc;line-height:1.7;max-width:760px;margin:0}.progress{margin-top:18px;display:flex;align-items:center;gap:10px}.bar{height:7px;background:#172234;border-radius:8px;overflow:hidden;flex:1}.bar i{display:block;height:100%;width:0;background:var(--green);transition:.2s}.progress span{font-size:9px;color:#718198;white-space:nowrap}.layout{display:grid;grid-template-columns:1.6fr .8fr;gap:12px}.card{background:linear-gradient(145deg,#0b1523,#08101b);border:1px solid var(--line);border-radius:12px;padding:16px}.steps{display:grid;gap:10px}.step{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:13px;border:1px solid #ffffff0d;border-radius:10px;background:#ffffff02}.num{width:30px;height:30px;border-radius:9px;background:#5b8cff15;color:#8eb0ff;display:grid;place-items:center;font-weight:900}.step h3{margin:0 0 5px;font-size:12px}.step p{margin:0;color:#8998ad;font-size:11px;line-height:1.65}.step a{color:#83a8ff;text-decoration:none;font-weight:800}.tip{margin-top:8px;padding:10px;border-left:2px solid var(--blue);background:#5b8cff08;color:#8e9caf;font-size:10px;line-height:1.6}.sideTitle{font-size:9px;letter-spacing:1px;color:#536177;font-weight:900;margin-bottom:10px}.checklist{display:grid;gap:8px}.check{display:flex;gap:9px;align-items:flex-start;padding:9px;border:1px solid #ffffff0a;border-radius:8px;color:#a5b1c2;font-size:10px;line-height:1.5}.check input{margin-top:2px;accent-color:var(--green)}.check.done{color:#6ee2bd;text-decoration:line-through;text-decoration-color:#25d39a55}.quick{display:grid;gap:7px;margin-top:14px}.quick a{display:flex;justify-content:space-between;padding:10px;border:1px solid #ffffff0d;border-radius:8px;color:#c5cfdd;text-decoration:none;font-size:10px;font-weight:800}.quick a:hover{background:#ffffff05}.sectionTitle{margin:18px 0 9px;font-size:11px;letter-spacing:.7px}.note{color:#7f8da3;font-size:10px;line-height:1.65}.kbd{display:inline-block;padding:2px 5px;border:1px solid #ffffff18;border-radius:4px;background:#ffffff06;color:#cbd5e1;font-size:9px}.shade{display:none}
+@media(max-width:900px){.main{margin-left:0}.layout{grid-template-columns:1fr}.content{padding:12px}.top{padding-left:58px}}
+</style>
+</head>
+<body>
+<div id="appSidebar"></div>
+<main class="main">
+<header class="top"><div><h1>Getting Started</h1><p>Learn the Game API dashboard from account setup to your first API request</p></div><a href="documentation.html" style="color:#83a8ff;font-size:9px;font-weight:800;text-decoration:none">Full Documentation →</a></header>
+<section class="content">
+<div class="hero">
+<div class="eyebrow">GAME API DASHBOARD GUIDE</div>
+<h2>Welcome to your developer dashboard</h2>
+<p>This guide walks you through the normal workflow: secure your account, create an API key, test an endpoint, monitor usage, and connect your application. Complete the checklist as you go; your progress is saved on this device.</p>
+<div class="progress"><div class="bar"><i id="progressBar"></i></div><span id="progressText">0% complete</span></div>
+</div>
+<div class="layout">
+<section class="card">
+<div class="sectionTitle">THE BASIC WORKFLOW</div>
+<div class="steps">
+<div class="step"><div class="num">1</div><div><h3>Secure your account</h3><p>Open <a href="mfa-setup.html">Security</a> and enable an authenticator if you want two-factor protection. You can also manage browser/mobile push notifications from <a href="settings.html">Settings</a>.</p></div></div>
+<div class="step"><div class="num">2</div><div><h3>Understand your plan</h3><p>Open <a href="pricing.html">Plans</a> to see your current plan, request allowance, and available upgrades. Your current paid plan is shown as the active plan.</p></div></div>
+<div class="step"><div class="num">3</div><div><h3>Create an API key</h3><p>Go to <a href="api-keys.html">API Keys</a>, create a key with a clear name, and keep the secret private. Treat an API key like a password: do not publish it in frontend code or public repositories.</p></div></div>
+<div class="step"><div class="num">4</div><div><h3>Test your API</h3><p>Use <a href="test.html">Test API</a> before connecting your application. Select an endpoint, add your API key, send the request, and inspect the response.</p></div></div>
+<div class="step"><div class="num">5</div><div><h3>Connect your application</h3><p>After a successful test, use the endpoint and authentication format shown in <a href="documentation.html">Documentation</a>. Keep your secret on your server whenever possible.</p></div></div>
+<div class="step"><div class="num">6</div><div><h3>Monitor everything</h3><p>Use <a href="usage.html">Usage</a> for request activity, <a href="status.html">Status</a> for service health, and <a href="live.html">Live Stream</a> for realtime game events.</p></div></div>
+</div>
+<div class="tip"><b>Recommended order:</b> Security → Plans → API Keys → Test API → Documentation → Usage/Live Stream.</div>
+</section>
+<aside class="card">
+<div class="sideTitle">YOUR STARTUP CHECKLIST</div>
+<div class="checklist">
+<label class="check"><input type="checkbox" data-check="security"> Enable account security</label>
+<label class="check"><input type="checkbox" data-check="plan"> Review your plan</label>
+<label class="check"><input type="checkbox" data-check="key"> Create an API key</label>
+<label class="check"><input type="checkbox" data-check="test"> Make a test API request</label>
+<label class="check"><input type="checkbox" data-check="docs"> Read the API documentation</label>
+<label class="check"><input type="checkbox" data-check="usage"> Check usage after testing</label>
+</div>
+<div class="sideTitle" style="margin-top:18px">QUICK ACCESS</div>
+<div class="quick">
+<a href="dashboard.html">Dashboard <span>→</span></a>
+<a href="api-keys.html">API Keys <span>→</span></a>
+<a href="test.html">API Tester <span>→</span></a>
+<a href="documentation.html">Documentation <span>→</span></a>
+<a href="live.html">Live Stream <span>→</span></a>
+</div>
+</aside>
+</div>
+<div class="card" style="margin-top:12px">
+<div class="sectionTitle">WHAT EACH DASHBOARD AREA DOES</div>
+<p class="note"><b>Dashboard:</b> account overview, plan, request capacity, API health, and quick actions.</p>
+<p class="note"><b>API Keys:</b> create and manage credentials used to authenticate requests.</p>
+<p class="note"><b>Test API:</b> send controlled requests without building your application first.</p>
+<p class="note"><b>Usage:</b> review API request consumption and remaining capacity for the current period.</p>
+<p class="note"><b>Projects:</b> organize your development work as your integration grows.</p>
+<p class="note"><b>Live Stream:</b> connect to realtime game events through the WebSocket service.</p>
+<p class="note"><b>Documentation:</b> endpoint references, authentication guidance, request examples, and integration information.</p>
+<p class="note"><b>Status:</b> check whether the public API and realtime services are available.</p>
+<p class="note"><b>Plans:</b> review your subscription and available plan options.</p>
+<p class="note"><b>Security:</b> manage authenticator-based two-factor authentication.</p>
+<p class="note"><b>Settings:</b> manage account preferences and notification permissions.</p>
+</div>
+<div class="card" style="margin-top:12px">
+<div class="sectionTitle">IMPORTANT SECURITY RULES</div>
+<p class="note">Never post your API key in GitHub, screenshots, public websites, chat groups, or frontend JavaScript that visitors can inspect.</p>
+<p class="note">If a key is exposed, revoke it from <a href="api-keys.html" style="color:#83a8ff">API Keys</a> and create a replacement.</p>
+<p class="note">Use HTTPS for your application and keep authentication credentials on your backend where possible.</p>
+</div>
+</section>
+</main>
+<script src="app.js"></script>
+<script>
+(() => {
+ const KEY="game_api_getting_started";
+ const checks=[...document.querySelectorAll("[data-check]")];
+ let state={};
+ try{state=JSON.parse(localStorage.getItem(KEY)||"{}")}catch{}
+ function render(){
+   let done=0;
+   checks.forEach(c=>{c.checked=!!state[c.dataset.check];c.closest(".check").classList.toggle("done",c.checked);if(c.checked)done++});
+   const pct=Math.round(done/checks.length*100);
+   document.getElementById("progressBar").style.width=pct+"%";
+   document.getElementById("progressText").textContent=pct+"% complete";
+ }
+ checks.forEach(c=>c.addEventListener("change",()=>{state[c.dataset.check]=c.checked;localStorage.setItem(KEY,JSON.stringify(state));render()}));
+ render();
+})();
+</script>
+</body>
+</html>
