@@ -99,9 +99,13 @@
       const plan = String(result.plan || "free").toLowerCase();
       const label = plan.charAt(0).toUpperCase() + plan.slice(1);
       const action = document.getElementById("appPlanAction");
+      const dashboardAction = document.getElementById("dashboardPlanAction");
       if (action) {
         action.textContent = plan === "free" ? "✦ Upgrade Plan" : "✓ Current Plan: " + label;
         action.setAttribute("aria-label", plan === "free" ? "Upgrade Plan" : "Current plan: " + label);
+      }
+      if (dashboardAction) {
+        dashboardAction.textContent = plan === "free" ? "✦ Upgrade" : "✓ Current Plan: " + label;
       }
       const accountPlan = document.querySelector("[data-current-plan]");
       if (accountPlan) accountPlan.textContent = label;
