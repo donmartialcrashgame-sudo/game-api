@@ -81,6 +81,21 @@
 <script src="app.js"></script>
 <script>
 (() => {
+ const markGuideSeen = async () => {
+   try {
+     const mod = await import("https://esm.sh/@supabase/supabase-js@2.105.0");
+     const sb = mod.createClient("https://qbagxeqquskkjksoraiz.supabase.co", "sb_publishable_chfRxHSFPSA1SZJtBajtKA_I7vs8R--");
+     const { data } = await sb.auth.getSession();
+     if (data.session?.user) {
+       await sb.auth.updateUser({ data: { getting_started_seen: true } });
+     }
+   } catch {}
+ };
+ markGuideSeen();
+})();
+</script>
+<script>
+(() => {
  const KEY="game_api_getting_started";
  const checks=[...document.querySelectorAll("[data-check]")];
  let state={};
