@@ -33,7 +33,7 @@
           }
         }
       }],
-      merchantInfo:{merchantName:"Game API"},
+      merchantInfo:{merchantName:"Game API",merchantId:"12345678901234567890"},
       transactionInfo:{
         totalPriceStatus:"FINAL",
         totalPrice:"4000.00",
@@ -65,7 +65,7 @@
           setStatus("Opening Google Pay TEST checkout…");
           paymentsClient.loadPaymentData(getPaymentDataRequest()).catch(function(error){
             if(error && error.statusCode==="CANCELED"){setStatus("Google Pay test checkout was cancelled.");return;}
-            console.error(error);setStatus("Google Pay TEST checkout could not be completed. Check the browser console.","error");
+            console.error("Google Pay TEST loadPaymentData error:",error);const code=error&&error.statusCode?(" ["+error.statusCode+"]"):"";const message=error&&error.statusMessage?(" "+error.statusMessage):"";setStatus("Google Pay TEST checkout failed."+code+message,"error");
           });
         },
         buttonType:"buy",
