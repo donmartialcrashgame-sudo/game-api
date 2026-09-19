@@ -180,7 +180,7 @@ async function beginSetup(factors){
 
   const{data,error}=await supabase.auth.mfa.enroll({
     factorType:"totp",
-    friendlyName:"Gaming API Authenticator"
+    friendlyName:`Gaming API Authenticator ${Date.now()}`
   });
 
   if(error) throw error;
