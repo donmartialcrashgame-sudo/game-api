@@ -71,7 +71,7 @@
     <div class="nav-inner">
       <a class="brand" href="#top"><span class="brand-mark"><span>G</span></span>Gaming API</a>
       <nav class="nav-links">
-        <a href="#live">Live Game</a><a href="#platform">Platform</a><a href="#security">Security</a><a href="#faq">FAQ</a>
+        <a href="/live.html">Live Game</a><a href="/documentation.html">Docs</a><a href="/pricing.html">Pricing</a><a href="/status.html">Status</a><a href="/about.html">About</a>
       </nav>
       <div class="nav-actions"><a class="btn login-link" href="/login.html">Sign in</a><a class="btn btn-primary" href="/login.html">Sign up</a></div>
     </div>
@@ -165,10 +165,10 @@
     </section>
   </main>
 
-  <footer><div class="footer-inner"><div>© 2026 Gaming API. All rights reserved.</div><div>Real-time infrastructure · Secure authentication · Developer platform</div></div></footer>
+  <footer><div class="footer-inner"><div>© 2026 Gaming API. All rights reserved.</div><div><a href="/live.html">Live</a> · <a href="/documentation.html">Docs</a> · <a href="/pricing.html">Pricing</a> · <a href="/status.html">Status</a> · <a href="/contact.html">Contact</a></div></div></footer>
 
   <script>
-    const WS_URL='wss://gaming-api-d7up.onrender.com/';
+    const WS_URL='wss://api.game-api.online/realtime';
     const $=id=>document.getElementById(id);
     let socket=null,reconnectTimer=null;
     const history=[];
@@ -179,7 +179,7 @@
     function escapeHtml(v){return text(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
     function addRound(item){if(!item)return;const id=text(item.id),status=text(item.status).toUpperCase(),value=number(item.value);const existing=history.find(x=>x.id&&id&&x.id===id);if(existing)Object.assign(existing,{status,value});else history.unshift({id:id||`round-${Date.now()}`,status:status||'UPDATE',value});history.splice(8);renderHistory()}
     function handle(raw){let data;try{data=typeof raw==='string'?JSON.parse(raw):raw}catch{return}const event=text(pick(data,['event','type','name'])).toLowerCase();const payload=data&&data.data&&typeof data.data==='object'?data.data:data&&data.payload&&typeof data.payload==='object'?data.payload:data;const state=text(pick(payload,['status','state'])).toLowerCase()||event;const id=pick(payload,['roundId','round_id','id','round']);const value=number(pick(payload,['multiplier','currentMultiplier','current_multiplier','value']));if(id!=null){$('roundTitle').textContent='Round '+text(id);$('currentRound').textContent=text(id)}$('state').textContent=(state||'UPDATE').toUpperCase();if(value!=null){$('multiplier').textContent=value.toFixed(2)+'×';$('sub').textContent=state.includes('crash')?'Round crashed':state.includes('wait')?'Waiting for next round':'Live multiplier'}else if(state.includes('wait')){$('multiplier').textContent='—';$('sub').textContent='Waiting for next round'}addRound({id,status:state,value})}
-    function connect(){clearTimeout(reconnectTimer);$('connection').textContent='Connecting…';$('state').textContent='CONNECTING';try{socket=new WebSocket(WS_URL)}catch(e){reconnect();return}socket.onopen=()=>{$('connection').textContent='Live WebSocket connected';$('state').textContent='CONNECTED'};socket.onmessage=e=>handle(e.data);socket.onerror=()=>{$('connection').textContent='WebSocket connection error'};socket.onclose=()=>{$('connection').textContent='Reconnecting…';$('state').textContent='OFFLINE';reconnect()}}
+    function connect(){clearTimeout(reconnectTimer);$('connection').textContent='Connecting…';$('state').textContent='CONNECTING';try{socket=new WebSocket(WS_URL)}catch(e){reconnect();return}socket.onopen=()=>{$('connection').textContent='Live WebSocket connected';$('state').textContent='CONNECTED';socket.send(JSON.stringify({type:'subscribe',channel:'crash_rounds'}));};socket.onmessage=e=>handle(e.data);socket.onerror=()=>{$('connection').textContent='WebSocket connection error'};socket.onclose=()=>{$('connection').textContent='Reconnecting…';$('state').textContent='OFFLINE';reconnect()}}
     function reconnect(){clearTimeout(reconnectTimer);reconnectTimer=setTimeout(connect,3000)}
     connect();
   </script>
