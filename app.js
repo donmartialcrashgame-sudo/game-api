@@ -22,6 +22,11 @@
   let sidebarPrefs = { position: "left", collapsed: false, color: "blue" }; try { sidebarPrefs = { ...sidebarPrefs, ...JSON.parse(localStorage.getItem("gaming_api_sidebar") || "{}") }; } catch {}
   const colors = { blue: ["#07101b","#5b8cff"], purple: ["#100a1b","#9b6cff"], green: ["#071711","#22c99a"], slate: ["#0d1118","#8796aa"] };
   const theme = colors[sidebarPrefs.color] || colors.blue;
+  const manifestLink = document.createElement("link");
+  manifestLink.rel = "manifest";
+  manifestLink.href = "/manifest.json";
+  document.head.appendChild(manifestLink);
+
   const css = `
 .has-app-sidebar{padding-left:269px}.has-app-sidebar .app-sidebar{left:0}.app-sidebar{background:var(--app-sidebar-bg,#07101b)}.app-sidebar.app-collapsed{width:72px}.app-sidebar.app-collapsed .app-brand span:last-child,.app-sidebar.app-collapsed .app-title,.app-sidebar.app-collapsed .app-nav a{font-size:0}.app-sidebar.app-collapsed .app-brand{justify-content:center}.app-sidebar.app-collapsed .app-nav a{display:grid;place-items:center}.app-sidebar.app-collapsed .app-user,.app-sidebar.app-collapsed .app-upgrade{display:none}.app-sidebar.app-collapsed .app-out{font-size:0}.app-sidebar.app-collapsed .app-out:after{content:'↪';font-size:14px}.app-sidebar.app-top{width:100%;height:66px;inset:0 0 auto 0;flex-direction:row;align-items:center;border-right:0;border-bottom:1px solid #ffffff10;padding:8px 14px}.app-top-body{padding-top:66px}.app-top .app-brand{padding:0 10px}.app-top .app-group{padding:0;display:flex;align-items:center}.app-top .app-title,.app-top .app-user,.app-top .app-out{display:none}.app-top .app-nav{display:flex}.app-top .app-bottom{margin-left:auto}.app-top .app-upgrade{margin:0;width:auto}@media(max-width:900px){.has-app-sidebar{padding-left:0}}
 .app-sidebar{width:245px;position:fixed;inset:0 auto 0 0;background:#07101b;border-right:1px solid #ffffff10;padding:15px 12px;display:flex;flex-direction:column;z-index:100}
