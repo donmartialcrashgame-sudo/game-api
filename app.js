@@ -119,6 +119,29 @@
   }
   loadCurrentPlan();
 
+  // Show the Getting Started guide once for every authenticated user.
+  // The flag is stored in Supabase user metadata, so existing users see it too,
+  // not only users who register after this feature is added.
+  async function showGettingStartedOnce() {
+    const page = location.pathname.split("/").pop() || "dashboard.html";
+    const publicPages = new Set(["", "index.html", "login.html", "signup.html", "forgot-password.html", "reset-password.html", "guide.html"]);
+    if (publicPages.has(page)) return;
+
+    try {
+      const mod = await import("https://esm.sh/@supabase/supabase-js@2.105.0");
+      const sb = mod.createClient("https://qbagxeqquskkjksoraiz.supabase.co", "sb_publishable_chfRxHSFPSA1SZJtBajtKA_I7vs8R--");
+      const { data } = await sb.auth.getSession();
+      if (!data.session?.user) return;
+
+      const seen = data.session.user.user_metadata?.getting_started_seen === true;
+      if (!seen) {
+        location.replace("guide.html");
+      }
+    } catch {}
+  }
+
+  showGettingStartedOnce();
+
   window.GameApiApp = {
     toggleSidebar: toggle,
     closeSidebar: () => { side.classList.remove("open"); shade.classList.remove("show"); },
