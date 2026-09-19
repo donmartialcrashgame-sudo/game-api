@@ -13,13 +13,13 @@
 <script type="module">
 import{createClient}from"https://esm.sh/@supabase/supabase-js@2.105.0";
 const supabase=createClient("https://qbagxeqquskkjksoraiz.supabase.co","sb_publishable_chfRxHSFPSA1SZJtBajtKA_I7vs8R--");
-async function activateDemoPlan(plan,amount,statusEl,label){
+async function activateDemoPlan(plan,amount,statusEl,label,statusSetter){
   const {data,error}=await supabase.auth.getSession();
-  if(error||!data.session){ setStatus(statusEl,"Please sign in before upgrading.","error"); setTimeout(()=>location.href="login.html?next=pricing.html",700); return; }
+  if(error||!data.session){ statusSetter(statusEl,"Please sign in before upgrading.","error"); setTimeout(()=>location.href="login.html?next=pricing.html",700); return; }
   const response=await fetch("https://api.game-api.online/api/payments/demo/activate",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+data.session.access_token},body:JSON.stringify({plan,amount,paymentId:"gpay-test-"+Date.now()})});
   const result=await response.json();
   if(!response.ok) throw new Error(result.error||"Could not activate plan");
-  setStatus(statusEl,"✓ "+label+" activated. Your existing API keys now use the new plan.","success");
+  statusSetter(statusEl,"✓ "+label+" activated. Your existing API keys now use the new plan.","success");
   setTimeout(()=>location.href="dashboard.html",900);
 }
 (function(){
@@ -87,7 +87,7 @@ async function activateDemoPlan(plan,amount,statusEl,label){
             paymentsClient.loadPaymentData(getPaymentDataRequest(plan)).then(function(paymentData){
               console.log("Google Pay TEST payment data:",paymentData);
               setStatus(statusEl,plan.label+" Google Pay TEST payment response received. No real charge was made.","success");
-              activateDemoPlan(plan.key,Number(plan.price),statusEl,plan.label).catch(function(error){console.error("DEMO PLAN ACTIVATION ERROR:",error);setStatus(statusEl,"Payment test succeeded, but plan activation failed. Please try again.","error");});
+              activateDemoPlan(plan.key,Number(plan.price),statusEl,plan.label,setStatus).catch(function(error){console.error("DEMO PLAN ACTIVATION ERROR:",error);setStatus(statusEl,"Payment test succeeded, but plan activation failed. Please try again.","error");});
             }).catch(function(error){
               if(error && error.statusCode==="CANCELED"){
                 setStatus(statusEl,"Google Pay test checkout was cancelled.");
