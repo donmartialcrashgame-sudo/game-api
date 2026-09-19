@@ -155,7 +155,7 @@ function setLoading(show){
   $("loading").classList.toggle("hidden",!show);
 }
 
-async function getSession(){
+async function sendSecurityPush(title,message){try{const{data}=await supabase.auth.getSession();if(!data.session)return;await fetch("https://qbagxeqquskkjksoraiz.supabase.co/functions/v1/push-notifications",{method:"POST",headers:{Authorization:"Bearer "+data.session.access_token,"Content-Type":"application/json"},body:JSON.stringify({action:"send",title,message,url:"https://game-api.online/mfa-setup.html",tag:"security"})})}catch(error){console.warn("Security push notification failed:",error)}}\n\nasync function getSession(){
   const{data,error}=await supabase.auth.getSession();
   if(error||!data.session){
     location.replace("login.html");
@@ -273,7 +273,7 @@ $("verify").onclick=async()=>{
     setBadge("Enabled","good");
     $("setup").classList.add("hidden");
     $("enabled").classList.remove("hidden");
-    message("✓ Google Authenticator has been enabled successfully.","success");
+    message("✓ Google Authenticator has been enabled successfully.","success");void sendSecurityPush("Game API security alert","A new authenticator was enabled on your account.");
 
     if(window.GameApiApp)window.GameApiApp.mfaEnabled=true;
   }catch(error){
@@ -318,7 +318,7 @@ $("remove").onclick=async()=>{
     $("enabled").classList.add("hidden");
     $("setup").classList.add("hidden");
     setBadge("Removed","warn");
-    message("✓ Authenticator removed. The verified TOTP factor has been unenrolled from Supabase Auth.","success");
+    message("✓ Authenticator removed. The verified TOTP factor has been unenrolled from Supabase Auth.","success");void sendSecurityPush("Game API security alert","Your authenticator was removed from your account.");
 
     setTimeout(async()=>{
       try{
