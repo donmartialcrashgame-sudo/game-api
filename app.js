@@ -35,7 +35,7 @@
     window.supabase = authClient;
     return authClient;
   }
-  const publicPages = new Set(["", "index.html", "auth.html", "signup.html", "forgot-password.html", "reset-password.html"]);
+  const publicPages = new Set(["", "index.html", "login.html", "signup.html", "forgot-password.html", "reset-password.html"]);
   const pageName = location.pathname.split("/").pop() || "index.html";
   const isPublicPage = publicPages.has(pageName);
   const isGuidePage = pageName === "guide.html";
@@ -107,7 +107,7 @@
   if (signout) signout.onclick = async () => {
     try { const sb = await getAuthClient(); await sb.auth.signOut(); }
     catch {}
-    location.replace("auth.html");
+    location.replace("login.html");
   };
   shade.onclick = () => { side.classList.remove("open"); shade.classList.remove("show"); };
 
@@ -147,7 +147,7 @@
       if (error) throw error;
       currentSession = data.session;
       if (!currentSession && !isPublicPage) {
-        location.replace("auth.html?redirect=" + encodeURIComponent(location.href));
+        location.replace("login.html?redirect=" + encodeURIComponent(location.href));
         return false;
       }
       if (currentSession) {
@@ -158,7 +158,7 @@
       return true;
     } catch (error) {
       console.error("Authentication check failed:", error);
-      if (!isPublicPage) location.replace("auth.html");
+      if (!isPublicPage) location.replace("login.html");
       return false;
     }
   }
