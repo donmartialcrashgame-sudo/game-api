@@ -1,0 +1,14 @@
+{
+  "name":"Game API",
+  "short_name":"Game API",
+  "id":"/",
+  "start_url":"/dashboard.html",
+  "scope":"/",
+  "display":"standalone",
+  "background_color":"#050811",
+  "theme_color":"#050811",
+  "description":"Game API developer console and real-time gaming infrastructure.",
+  "icons":[
+    {"src":"/favicon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
