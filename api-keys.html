@@ -43,7 +43,7 @@
 <section class="content">
   <div class="intro">
     <div><h2>API Keys</h2><div class="muted">Create credentials for your applications. Secret keys are generated securely by the backend and are shown only once.</div></div>
-    <button class="primary" id="create">+ Create new key</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="primary" style="text-decoration:none;display:inline-flex;align-items:center" href="test.html">◉ Test API</a><button class="secondary" id="copySaved">Copy last key</button><button class="primary" id="create">+ Create new key</button></div>
   </div>
   <div class="planbar"><div class="planbox"><small>Current plan</small><strong id="planName">Free</strong></div><div class="planbox"><small>Monthly requests</small><strong id="planUsage">—</strong><div class="progress"><i id="planProgress" style="width:0%"></i></div></div><div class="planbox"><small>Requests remaining</small><strong id="planRemaining">—</strong></div></div>
   <div class="panel">
@@ -146,7 +146,7 @@ $("generate").onclick = async () => {
   try {
     const result = await backend("create", { name });
     $("modal").classList.remove("show");
-    $("secret").textContent = result.secret;
+    $("secret").textContent = result.secret;\n    try { localStorage.setItem("game_api_last_secret", result.secret); } catch {}
     $("secretModal").classList.add("show");
     await loadKeys();
   } catch (e) { showError(e.message); }
@@ -157,7 +157,7 @@ $("copy").onclick = async () => {
   try { await navigator.clipboard.writeText($("secret").textContent); $("copy").textContent = "Copied"; setTimeout(() => $("copy").textContent = "Copy key", 1500); }
   catch { showError("Clipboard access failed. Copy the key manually."); }
 };
-$("done").onclick = () => $("secretModal").classList.remove("show");
+$("done").onclick = () => $("secretModal").classList.remove("show");\n$("copySaved").onclick = async () => { const saved = localStorage.getItem("game_api_last_secret"); if (!saved) { alert("No previously generated key is saved on this device."); return; } try { await navigator.clipboard.writeText(saved); $("copySaved").textContent = "Copied"; setTimeout(() => $("copySaved").textContent = "Copy last key", 1400); } catch { alert("Clipboard access failed."); } };
 $("hamb").onclick = () => $("side").classList.toggle("open");
 $("signout").onclick = async () => { await supabase.auth.signOut(); location.href = "login.html"; };
 
