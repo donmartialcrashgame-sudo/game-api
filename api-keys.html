@@ -82,7 +82,7 @@ function saveSecret(keyId, secret) {
 }
 async function copySecretFor(keyId) {
   const map = savedSecrets();
-  const secret = map[keyId] || localStorage.getItem("game_api_last_secret");
+  const secret = map[keyId];
   if (!secret) { alert("This secret is not saved on this device. The backend cannot recover an old secret."); return false; }
   try { await navigator.clipboard.writeText(secret); return true; }
   catch { alert("Clipboard access failed."); return false; }
