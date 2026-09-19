@@ -17,7 +17,7 @@
   ];
 
   const css = `
-.app-sidebar{width:245px;position:fixed;inset:0 auto 0 0;background:#07101b;border-right:1px solid #ffffff10;padding:15px 12px;display:flex;flex-direction:column;z-index:100}
+.has-app-sidebar{padding-left:269px}.has-app-sidebar .app-sidebar{left:0}\n@media(max-width:900px){.has-app-sidebar{padding-left:0}}\n.app-sidebar{width:245px;position:fixed;inset:0 auto 0 0;background:#07101b;border-right:1px solid #ffffff10;padding:15px 12px;display:flex;flex-direction:column;z-index:100}
 .app-brand{display:flex;align-items:center;gap:10px;padding:7px 9px 22px;font-weight:900;color:#f3f7fb;text-decoration:none}
 .app-logo{width:37px;height:37px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,#5b8cff,#7047e8);box-shadow:0 8px 28px #5b8cff24}
 .app-brand small{display:block;color:#58677d;font-size:8px;letter-spacing:1.2px;margin-top:2px}
@@ -36,8 +36,9 @@
   style.textContent = css;
   document.head.appendChild(style);
 
-  const host = document.getElementById("appSidebar");
-  if (!host) return;
+  let host = document.getElementById("appSidebar");
+  if (!host) { host = document.createElement("div"); host.id = "appSidebar"; document.body.prepend(host); }
+  if (!document.querySelector(".shell") && !document.querySelector(".layout")) document.body.classList.add("has-app-sidebar");
 
   const current = location.pathname.split("/").pop() || "dashboard.html";
   const nav = NAV.map(group => `
@@ -55,7 +56,7 @@
       ${nav}
       <div class="app-bottom">
         <div class="app-user"><b id="email">Authenticated</b><span>Developer account</span></div>
-        <button class="app-out" id="out">Sign out</button>
+        <button class="app-out" id="signout">Sign out</button>
       </div>
     </aside>
     <button class="app-menu" id="appMenu" aria-label="Open navigation">☰</button>
@@ -66,6 +67,8 @@
   const shade = document.getElementById("appShade");
   const toggle = () => { side.classList.toggle("open"); shade.classList.toggle("show"); };
   document.getElementById("appMenu").onclick = toggle;
+  const signout = document.getElementById("signout");
+  if (signout) signout.onclick = async () => { try { const sb = window.supabase; if (sb?.auth) await sb.auth.signOut(); } catch {} location.href = "login.html"; };
   shade.onclick = () => { side.classList.remove("open"); shade.classList.remove("show"); };
 
   window.GameApiApp = {
