@@ -25,7 +25,7 @@
 <section class="content">
   <div class="intro">
     <div><h2>API Keys</h2><div class="muted">Create credentials for your applications. Secret keys are generated securely by the backend and are shown only once.</div></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="primary" style="text-decoration:none;display:inline-flex;align-items:center" href="test.html">◉ Test API</a><button class="secondary" id="copySaved">Copy last key</button><button class="primary" id="create">+ Create new key</button></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="primary" style="text-decoration:none;display:inline-flex;align-items:center" href="test.html">◉ Test API</a><button class="secondary icon-copy" id="copySaved" title="Copy saved API secret" aria-label="Copy saved API secret">⧉</button><button class="primary" id="create">+ Create new key</button></div>
   </div>
   <div class="planbar"><div class="planbox"><small>Current plan</small><strong id="planName">Free</strong></div><div class="planbox"><small>Monthly requests</small><strong id="planUsage">—</strong><div class="progress"><i id="planProgress" style="width:0%"></i></div></div><div class="planbox"><small>Requests remaining</small><strong id="planRemaining">—</strong></div></div>
   <div class="panel">
@@ -63,11 +63,30 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const $ = id => document.getElementById(id);
 let session = null;
 let keys = [];
+let maxActiveKeys = 2;
 
 function showError(text) { $("error").textContent = text; $("error").hidden = false; }
 function clearError() { $("error").hidden = true; $("error").textContent = ""; }
 function esc(value) { return String(value ?? "").replace(/[&<>\"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;"}[c])); }
-function preview(key) { return `${key.key_prefix}_••••••••${key.key_last4}`; }
+function preview(key) { return key.key_prefix + "_••••••••" + key.key_last4; }
+function savedSecrets() {
+  try { return JSON.parse(localStorage.getItem("game_api_key_secrets") || "{}"); } catch { return {}; }
+}
+function saveSecret(keyId, secret) {
+  try {
+    const map = savedSecrets();
+    if (keyId) map[keyId] = secret;
+    localStorage.setItem("game_api_key_secrets", JSON.stringify(map));
+    localStorage.setItem("game_api_last_secret", secret);
+  } catch {}
+}
+async function copySecretFor(keyId) {
+  const map = savedSecrets();
+  const secret = map[keyId] || localStorage.getItem("game_api_last_secret");
+  if (!secret) { alert("This secret is not saved on this device. The backend cannot recover an old secret."); return false; }
+  try { await navigator.clipboard.writeText(secret); return true; }
+  catch { alert("Clipboard access failed."); return false; }
+}
 
 async function backend(action, extra = {}) {
   const routes = {
@@ -101,8 +120,13 @@ function render() {
   }
   $("tableWrap").className = "panel";
   $("tableWrap").innerHTML = `<table class="table"><thead><tr><th>Name</th><th>Plan</th><th>Key</th><th>Usage</th><th>Created</th><th>Status</th><th>Action</th></tr></thead><tbody>${list.map(k => `
-    <tr><td><strong>${esc(k.name)}</strong></td><td><span class="badge">${esc(String(k.plan||"free").toUpperCase())}</span></td><td class="key">${esc(preview(k))}</td><td>${Number(k.requests_used||0).toLocaleString()} / ${Number(k.monthly_limit||0).toLocaleString()}</td><td>${new Date(k.created_at).toLocaleDateString()}</td><td><span class="badge ${k.status === "revoked" ? "revoked" : ""}">${String(k.status).toUpperCase()}</span></td><td class="actions">${k.status === "active" ? `<button class="danger" data-revoke="${esc(k.id)}">Revoke</button>` : "—"}</td></tr>`).join("")}</tbody></table>`;
+    <tr><td><strong>${esc(k.name)}</strong></td><td><span class="badge">${esc(String(k.plan||"free").toUpperCase())}</span></td><td class="key">${esc(preview(k))}</td><td>${Number(k.requests_used||0).toLocaleString()} / ${Number(k.monthly_limit||0).toLocaleString()}</td><td>${new Date(k.created_at).toLocaleDateString()}</td><td><span class="badge ${k.status === "revoked" ? "revoked" : ""}">${String(k.status).toUpperCase()}</span></td><td class="actions">${k.status === "active" ? `<button class="icon-copy" title="Copy saved secret" aria-label="Copy saved secret" data-copy-key="${esc(k.id)}">⧉</button><button class="danger" data-revoke="${esc(k.id)}">Revoke</button>` : "—"}</td></tr>`).join("")}</tbody></table>`;
 
+  document.querySelectorAll("[data-copy-key]").forEach(button => {
+    button.addEventListener("click", async () => {
+      if (await copySecretFor(button.dataset.copyKey)) { button.textContent = "✓"; setTimeout(() => button.textContent = "⧉", 1200); }
+    });
+  });
   document.querySelectorAll("[data-revoke]").forEach(button => {
     button.addEventListener("click", async () => {
       if (!confirm("Revoke this API key? This cannot be undone.")) return;
@@ -115,7 +139,7 @@ function render() {
 
 async function loadKeys() {
   clearError();
-  try { const result = await backend("list"); keys = result.keys || []; const used=keys.reduce((s,k)=>s+Number(k.requests_used||0),0); const limit=Number(result.monthly_limit||0); const remaining=Math.max(limit-used,0); $("planName").textContent=String(result.plan||"free").toUpperCase(); $("planUsage").textContent=used.toLocaleString()+" / "+limit.toLocaleString(); $("planRemaining").textContent=remaining.toLocaleString(); $("planProgress").style.width=(limit?Math.min(100,used/limit*100):0)+"%"; render(); }
+  try { const result = await backend("list"); keys = result.keys || []; maxActiveKeys = Number(result.max_active_keys || 2); const atLimit = keys.filter(k => k.status === "active").length >= maxActiveKeys; $("create").disabled = atLimit; $("create").textContent = atLimit ? `${maxActiveKeys}/${maxActiveKeys} keys reached` : "+ Create new key"; const used=keys.reduce((s,k)=>s+Number(k.requests_used||0),0); const limit=Number(result.monthly_limit||0); const remaining=Math.max(limit-used,0); $("planName").textContent=String(result.plan||"free").toUpperCase(); $("planUsage").textContent=used.toLocaleString()+" / "+limit.toLocaleString(); $("planRemaining").textContent=remaining.toLocaleString(); $("planProgress").style.width=(limit?Math.min(100,used/limit*100):0)+"%"; render(); }
   catch (e) { showError(e.message); $("tableWrap").className = "empty"; $("tableWrap").textContent = "Unable to load API keys."; }
 }
 
@@ -130,7 +154,7 @@ $("generate").onclick = async () => {
     const result = await backend("create", { name });
     $("modal").classList.remove("show");
     $("secret").textContent = result.secret;
-    try { localStorage.setItem("game_api_last_secret", result.secret); } catch {}
+    saveSecret(result.key?.id, result.secret);
     $("secretModal").classList.add("show");
     await loadKeys();
   } catch (e) { showError(e.message); }
@@ -142,7 +166,7 @@ $("copy").onclick = async () => {
   catch { showError("Clipboard access failed. Copy the key manually."); }
 };
 $("done").onclick = () => $("secretModal").classList.remove("show");
-$("copySaved").onclick = async () => { const saved = localStorage.getItem("game_api_last_secret"); if (!saved) { alert("No previously generated key is saved on this device."); return; } try { await navigator.clipboard.writeText(saved); $("copySaved").textContent = "Copied"; setTimeout(() => $("copySaved").textContent = "Copy last key", 1400); } catch { alert("Clipboard access failed."); } };
+$("copySaved").onclick = async () => { const saved = localStorage.getItem("game_api_last_secret"); if (!saved) { alert("No saved API secret is available on this device."); return; } try { await navigator.clipboard.writeText(saved); $("copySaved").textContent = "✓"; setTimeout(() => $("copySaved").textContent = "⧉", 1400); } catch { alert("Clipboard access failed."); } };
 $("signout").onclick = async () => { await supabase.auth.signOut(); location.href = "login.html"; };
 
 async function init() {
