@@ -69,30 +69,26 @@ function showError(text) { $("error").textContent = text; $("error").hidden = fa
 function clearError() { $("error").hidden = true; $("error").textContent = ""; }
 function esc(value) { return String(value ?? "").replace(/[&<>\"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;"}[c])); }
 function preview(key) { return key.key_prefix + "_••••••••" + key.key_last4; }
-function savedSecrets() {
-  try { return JSON.parse(localStorage.getItem("game_api_key_secrets") || "{}"); } catch { return {}; }
-}
 function saveSecret(keyId, secret) {
-  try {
-    const map = savedSecrets();
-    if (keyId) map[keyId] = secret;
-    localStorage.setItem("game_api_key_secrets", JSON.stringify(map));
-    localStorage.setItem("game_api_last_secret", secret);
-  } catch {}
+  try { localStorage.setItem("game_api_last_secret", secret); } catch {}
 }
 async function copySecretFor(keyId) {
-  const map = savedSecrets();
-  const secret = map[keyId];
-  if (!secret) { alert("This secret is not saved on this device. The backend cannot recover an old secret."); return false; }
-  try { await navigator.clipboard.writeText(secret); return true; }
-  catch { alert("Clipboard access failed."); return false; }
+  try {
+    const result = await backend("secret", { id: keyId });
+    await navigator.clipboard.writeText(result.secret);
+    return true;
+  } catch (e) {
+    alert(e.message || "Could not recover this API secret.");
+    return false;
+  }
 }
 
 async function backend(action, extra = {}) {
   const routes = {
     list: { method: "GET", path: "/api/keys" },
     create: { method: "POST", path: "/api/keys" },
-    revoke: { method: "POST", path: extra.id ? `/api/keys/${encodeURIComponent(extra.id)}/revoke` : "" },\n    secret: { method: "GET", path: extra.id ? `/api/keys/${encodeURIComponent(extra.id)}/secret` : "" }
+    revoke: { method: "POST", path: extra.id ? `/api/keys/${encodeURIComponent(extra.id)}/revoke` : "" },
+    secret: { method: "GET", path: extra.id ? `/api/keys/${encodeURIComponent(extra.id)}/secret` : "" }
   };
   const route = routes[action];
   if (!route?.path) throw new Error("Invalid API key action");
