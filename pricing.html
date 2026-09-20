@@ -114,10 +114,11 @@ function applyCurrentPlan(){
 
   const currentLabel=currentPlan.charAt(0).toUpperCase()+currentPlan.slice(1);
   area.innerHTML=
-    "<p>You are currently subscribed to <strong>"+
-    currentLabel+
-    "</strong>.</p>"+
-    '<button class="btn primary" id="openUpgrade" type="button">↑ Upgrade Plan</button>';
+    "<p>You are currently subscribed to <strong>"+currentLabel+"</strong>.</p>"+
+    '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'+
+    '<button class="btn primary" id="openUpgrade" type="button">↑ Upgrade Plan</button>'+
+    (currentPlan==="starter" ? "" : '<button class="btn" id="cancelSubscription" type="button" style="border-color:#ff637855;color:#ff9aaa">Cancel subscription</button>')+
+    '</div>';
 
   currentCard.appendChild(area);
 
@@ -128,6 +129,29 @@ function applyCurrentPlan(){
   higher.forEach(card=>{
     options.appendChild(card);
     card.style.display="block";
+  });
+
+  const cancel=document.getElementById("cancelSubscription");
+  if(cancel) cancel.addEventListener("click", async ()=>{
+    if(!confirm("Cancel your "+currentLabel+" subscription and move this account to Starter?")) return;
+    cancel.disabled=true;
+    cancel.textContent="Cancelling…";
+    try{
+      const {data,error}=await supabase.auth.getSession();
+      if(error||!data.session) throw new Error("Please sign in again.");
+      const response=await fetch("https://api.game-api.online/api/payments/cancel",{
+        method:"POST",
+        headers:{Authorization:"Bearer "+data.session.access_token}
+      });
+      const result=await response.json();
+      if(!response.ok) throw new Error(result.error||"Could not cancel subscription.");
+      alert("Subscription cancelled successfully. Your account is now on Starter.");
+      location.reload();
+    }catch(error){
+      cancel.disabled=false;
+      cancel.textContent="Cancel subscription";
+      alert(error.message||"Could not cancel subscription.");
+    }
   });
 
   const open=document.getElementById("openUpgrade");
