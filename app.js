@@ -25,6 +25,9 @@ window.GameApiAppReady = (async () => {
   let sidebarPrefs = { position: "left", collapsed: false, color: "blue" }; try { sidebarPrefs = { ...sidebarPrefs, ...JSON.parse(localStorage.getItem("gaming_api_sidebar") || "{}") }; } catch {}
   const colors = { dark: ["#07101b","#5b8cff"], blue: ["#07101b","#5b8cff"], purple: ["#100a1b","#9b6cff"], green: ["#071711","#22c99a"], slate: ["#0d1118","#8796aa"], white: ["#ffffff","#3569e8"] };
   const theme = colors[sidebarPrefs.color] || colors.dark;
+  document.documentElement.style.setProperty("--app-sidebar-bg", theme[0]);
+  document.documentElement.style.setProperty("--app-sidebar-accent", theme[1]);
+  document.documentElement.style.setProperty("--app-sidebar-color", sidebarPrefs.color);
   const SUPABASE_URL = "https://qbagxeqquskkjksoraiz.supabase.co";
   const SUPABASE_KEY = "sb_publishable_chfRxHSFPSA1SZJtBajtKA_I7vs8R--";
   let authClient = null;
@@ -51,7 +54,10 @@ window.GameApiAppReady = (async () => {
   document.head.appendChild(manifestLink);
 
   const css = `
-.has-app-sidebar{padding-left:269px!important}.has-app-sidebar .app-sidebar{left:0}.has-app-sidebar .side,.has-app-sidebar .sidebar{display:none!important}.has-app-sidebar .main{margin-left:0!important;width:100%!important}.app-sidebar{background:var(--app-sidebar-bg,#07101b)}
+.has-app-sidebar{padding-left:269px!important}.has-app-sidebar .app-sidebar{left:0}.has-app-sidebar .side,.has-app-sidebar .sidebar{display:none!important}.has-app-sidebar .main{margin-left:0!important;width:100%!important}.app-sidebar{background:var(--app-sidebar-bg,#07101b)!important;border-right-color:#ffffff10}
+.app-sidebar .app-nav a:hover,.app-sidebar .app-nav a.active{background:color-mix(in srgb,var(--app-sidebar-accent,#5b8cff) 10%,transparent);color:#fff;box-shadow:inset 2px 0 var(--app-sidebar-accent,#5b8cff)}
+.app-sidebar .app-logo{background:linear-gradient(135deg,var(--app-sidebar-accent,#5b8cff),#7047e8);box-shadow:0 8px 28px color-mix(in srgb,var(--app-sidebar-accent,#5b8cff) 15%,transparent)}
+.app-sidebar .app-upgrade{background:linear-gradient(135deg,var(--app-sidebar-accent,#5b8cff),#7047e8);box-shadow:0 8px 22px color-mix(in srgb,var(--app-sidebar-accent,#5b8cff) 12%,transparent)}
 .app-sidebar-white .app-sidebar{background:#fff!important;border-right:1px solid #dce3ee!important}.app-sidebar-white .app-brand{color:#172033}.app-sidebar-white .app-brand small{color:#7a879b}.app-sidebar-white .app-title{color:#8793a6}.app-sidebar-white .app-nav a{color:#526078}.app-sidebar-white .app-nav a:hover,.app-sidebar-white .app-nav a.active{background:#3569e80d;color:#172033;box-shadow:inset 2px 0 #3569e8}.app-sidebar-white .app-user{background:#f6f8fc;border-color:#e1e6ef;color:#172033}.app-sidebar-white .app-user span{color:#7a879b}.app-sidebar-white .app-out{background:#f6f8fc;border-color:#e1e6ef;color:#526078}.app-sidebar-white .app-menu{background:#fff;color:#172033;border-color:#dce3ee}.app-sidebar-white .app-upgrade{background:linear-gradient(135deg,#3569e8,#7047e8)}.app-sidebar.app-collapsed{width:72px}.app-sidebar.app-collapsed .app-brand span:last-child,.app-sidebar.app-collapsed .app-title,.app-sidebar.app-collapsed .app-nav a{font-size:0}.app-sidebar.app-collapsed .app-brand{justify-content:center}.app-sidebar.app-collapsed .app-nav a{display:grid;place-items:center}.app-sidebar.app-collapsed .app-user,.app-sidebar.app-collapsed .app-upgrade{display:none}.app-sidebar.app-collapsed .app-out{font-size:0}.app-sidebar.app-collapsed .app-out:after{content:'↪';font-size:14px}.app-sidebar.app-top{width:100%;height:66px;inset:0 0 auto 0;flex-direction:row;align-items:center;border-right:0;border-bottom:1px solid #ffffff10;padding:8px 14px}.app-top-body{padding-top:66px}.app-top .app-brand{padding:0 10px}.app-top .app-group{padding:0;display:flex;align-items:center}.app-top .app-title,.app-top .app-user,.app-top .app-out{display:none}.app-top .app-nav{display:flex}.app-top .app-bottom{margin-left:auto}.app-top .app-upgrade{margin:0;width:auto}@media(max-width:900px){.has-app-sidebar{padding-left:0}}
 .app-sidebar{width:245px;position:fixed;inset:0 auto 0 0;background:#07101b;border-right:1px solid #ffffff10;padding:15px 12px;display:flex;flex-direction:column;z-index:100}
 .app-brand{display:flex;align-items:center;gap:10px;padding:7px 9px 22px;font-weight:900;color:#f3f7fb;text-decoration:none}
@@ -79,8 +85,6 @@ window.GameApiAppReady = (async () => {
   .app-shade.show{display:block}
 }
   `;
-  document.documentElement.style.setProperty("--app-sidebar-bg", theme[0]);
-  document.documentElement.style.setProperty("--app-sidebar-accent", theme[1]);
   if (sidebarPrefs.color === "white") document.body.classList.add("app-sidebar-white");
   if (isDeveloperPage && sidebarPrefs.position === "top") document.body.classList.add("app-top-body");
   const style = document.createElement("style");
