@@ -39,7 +39,7 @@ window.GameApiAppReady = (async () => {
     return authClient;
   }
   const publicPages = new Set(["", "index.html", "login.html", "signup.html", "forgot-password.html", "reset-password.html", "about.html", "status.html", "contact.html", "live.html", "documentation.html", "api-reference.html", "test.html", "pricing.html", "guide.html", "policy.html", "agreement.html", "usage-details.html"]);
-  const developerPages = new Set(["dashboard.html", "api-keys.html", "usage.html", "projects.html", "settings.html", "mfa-setup.html", "passkey-setup.html", "verify-mfa.html"]);
+  const developerPages = new Set(["dashboard.html", "api-keys.html", "test.html", "usage.html", "projects.html", "documentation.html", "api-reference.html", "guide.html", "settings.html", "mfa-setup.html", "passkey-setup.html", "verify-mfa.html"]);
   const pageName = location.pathname.split("/").pop() || "index.html";
   const isPublicPage = publicPages.has(pageName);
   const isDeveloperPage = developerPages.has(pageName);
