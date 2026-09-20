@@ -65,7 +65,18 @@ window.GameApiAppReady = (async () => {
 .app-out{width:100%;margin-top:7px;background:#ffffff04;border:1px solid #ffffff10;color:#9eabbc;border-radius:8px;padding:9px;cursor:pointer;font-weight:800;font-size:10px}
 .app-menu{display:none;position:fixed;left:12px;top:12px;z-index:110;border:1px solid #ffffff18;background:#0b1523;color:#fff;border-radius:8px;padding:9px 11px;cursor:pointer}
 .app-shade{display:none;position:fixed;inset:0;background:#0009;z-index:90}
-@media(max-width:900px){.app-sidebar{transform:translateX(-100%);transition:transform .2s}.app-sidebar.open{transform:none;box-shadow:20px 0 60px #000}.app-menu{display:block}.app-shade.show{display:block}}
+@media(max-width:900px){
+  .has-app-sidebar{padding-left:0!important;overflow-x:hidden!important}
+  .has-app-sidebar .main,.has-app-sidebar .content,.has-app-sidebar .page,.has-app-sidebar .container{
+    width:100%!important;max-width:100%!important;min-width:0!important;margin-left:0!important;margin-right:0!important;
+  }
+  .has-app-sidebar img,.has-app-sidebar video,.has-app-sidebar canvas,.has-app-sidebar svg{max-width:100%;height:auto}
+  .has-app-sidebar table{max-width:100%;display:block;overflow-x:auto}
+  .app-sidebar{transform:translateX(-100%);transition:transform .2s}
+  .app-sidebar.open{transform:none;box-shadow:20px 0 60px #000}
+  .app-menu{display:block}
+  .app-shade.show{display:block}
+}
   `;
   document.documentElement.style.setProperty("--app-sidebar-bg", theme[0]);
   if (isDeveloperPage && sidebarPrefs.position === "top") document.body.classList.add("app-top-body");
