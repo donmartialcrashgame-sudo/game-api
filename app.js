@@ -39,8 +39,10 @@ window.GameApiAppReady = (async () => {
     return authClient;
   }
   const publicPages = new Set(["", "index.html", "login.html", "signup.html", "forgot-password.html", "reset-password.html", "about.html", "status.html", "contact.html", "live.html", "documentation.html", "api-reference.html", "test.html", "pricing.html", "guide.html", "policy.html", "agreement.html", "usage-details.html"]);
+  const developerPages = new Set(["dashboard.html", "api-keys.html", "usage.html", "projects.html", "settings.html", "mfa-setup.html", "passkey-setup.html", "verify-mfa.html"]);
   const pageName = location.pathname.split("/").pop() || "index.html";
   const isPublicPage = publicPages.has(pageName);
+  const isDeveloperPage = developerPages.has(pageName);
   const isGuidePage = pageName === "guide.html";
 
   const manifestLink = document.createElement("link");
@@ -66,15 +68,17 @@ window.GameApiAppReady = (async () => {
 @media(max-width:900px){.app-sidebar{transform:translateX(-100%);transition:transform .2s}.app-sidebar.open{transform:none;box-shadow:20px 0 60px #000}.app-menu{display:block}.app-shade.show{display:block}}
   `;
   document.documentElement.style.setProperty("--app-sidebar-bg", theme[0]);
-  if (sidebarPrefs.position === "top") document.body.classList.add("app-top-body");
+  if (isDeveloperPage && sidebarPrefs.position === "top") document.body.classList.add("app-top-body");
   const style = document.createElement("style");
   style.id = "game-api-app-style";
   style.textContent = css;
   document.head.appendChild(style);
 
   let host = document.getElementById("appSidebar");
-  if (!host) { host = document.createElement("div"); host.id = "appSidebar"; document.body.prepend(host); }
-  document.body.classList.add("has-app-sidebar");
+  if (isDeveloperPage) {
+    if (!host) { host = document.createElement("div"); host.id = "appSidebar"; document.body.prepend(host); }
+    document.body.classList.add("has-app-sidebar");
+  }
 
   const current = location.pathname.split("/").pop() || "dashboard.html";
   const nav = NAV.map(group => `
@@ -86,7 +90,7 @@ window.GameApiAppReady = (async () => {
     </div>
   `).join("");
 
-  host.innerHTML = `
+  if (isDeveloperPage) host.innerHTML = `
     <aside class="app-sidebar" id="appSide">
       <a class="app-brand" href="dashboard.html"><span class="app-logo">G</span><span>Game API<small>DEVELOPER CONSOLE</small></span></a>
       ${nav}
@@ -101,18 +105,25 @@ window.GameApiAppReady = (async () => {
   `;
 
   const side = document.getElementById("appSide");
-  if (sidebarPrefs.position === "top") side.classList.add("app-top");
-  if (sidebarPrefs.collapsed) side.classList.add("app-collapsed");
+  if (side) {
+    if (sidebarPrefs.position === "top") side.classList.add("app-top");
+    if (sidebarPrefs.collapsed) side.classList.add("app-collapsed");
+  }
   const shade = document.getElementById("appShade");
-  const toggle = () => { side.classList.toggle("open"); shade.classList.toggle("show"); };
-  document.getElementById("appMenu").onclick = toggle;
+  const toggle = () => {
+    if (!side || !shade) return;
+    side.classList.toggle("open");
+    shade.classList.toggle("show");
+  };
+  const menu = document.getElementById("appMenu");
+  if (menu) menu.onclick = toggle;
   const signout = document.getElementById("signout");
   if (signout) signout.onclick = async () => {
     try { const sb = await getAuthClient(); await sb.auth.signOut(); }
     catch {}
     location.replace("login.html");
   };
-  shade.onclick = () => { side.classList.remove("open"); shade.classList.remove("show"); };
+  if (shade) shade.onclick = () => { side?.classList.remove("open"); shade.classList.remove("show"); };
 
   async function loadCurrentPlan() {
     try {
@@ -224,7 +235,7 @@ Content-Type: application/json
 
   window.GameApiApp = {
     toggleSidebar: toggle,
-    closeSidebar: () => { side.classList.remove("open"); shade.classList.remove("show"); },
+    closeSidebar: () => { side?.classList.remove("open"); shade?.classList.remove("show"); },
     currentPlan: "free"
   };
 })();
