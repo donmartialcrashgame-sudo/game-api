@@ -147,12 +147,13 @@ window.GameApiAppReady = (async () => {
     try {
       const key = "game_api_login_alert_sent:" + (session?.user?.id || "") + ":" + (session?.expires_at || "");
       if (!session?.user?.id || sessionStorage.getItem(key)) return;
-      sessionStorage.setItem(key, "1");
-      await fetch("https://api.game-api.online/api/mail/security/login", {
+      const response = await fetch("https://api.game-api.online/api/mail/security/login", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: "Bearer " + session.access_token },
         body: JSON.stringify({ method: "Authenticated sign-in" })
       });
+      if (response.ok) sessionStorage.setItem(key, "1");
+      else console.warn("Login security email returned HTTP", response.status);
     } catch (error) {
       console.warn("Login security email failed:", error);
     }
@@ -199,6 +200,7 @@ window.GameApiAppReady = (async () => {
         const email = currentSession.user?.email || "Authenticated";
         const emailEl = document.getElementById("email");
         if (emailEl) emailEl.textContent = email;
+        if (pageName === "dashboard.html") sendLoginSecurityAlert(currentSession);
       }
       return true;
     } catch (error) {
