@@ -145,7 +145,7 @@ window.GameApiAppReady = (async () => {
 
   async function sendLoginSecurityAlert(session) {
     try {
-      const key = "game_api_login_alert_sent:" + (session?.user?.id || "");
+      const key = "game_api_login_alert_sent:" + (session?.user?.id || "") + ":" + (session?.expires_at || "");
       if (!session?.user?.id || sessionStorage.getItem(key)) return;
       sessionStorage.setItem(key, "1");
       await fetch("https://api.game-api.online/api/mail/security/login", {
