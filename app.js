@@ -143,6 +143,21 @@ window.GameApiAppReady = (async () => {
   };
   if (shade) shade.onclick = () => { side?.classList.remove("open"); shade.classList.remove("show"); };
 
+  async function sendLoginSecurityAlert(session) {
+    try {
+      const key = "game_api_login_alert_sent:" + (session?.user?.id || "");
+      if (!session?.user?.id || sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, "1");
+      await fetch("https://api.game-api.online/api/mail/security/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + session.access_token },
+        body: JSON.stringify({ method: "Authenticated sign-in" })
+      });
+    } catch (error) {
+      console.warn("Login security email failed:", error);
+    }
+  }
+
   async function loadCurrentPlan() {
     try {
       const sb = await getAuthClient();
